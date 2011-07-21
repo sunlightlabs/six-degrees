@@ -1,4 +1,5 @@
 var duns_search_active = null;
+var connector_queue = [];
 
 function delay (ms, f, args) {
     setTimeout(function(){ f.apply(undefined, args); }, ms);
@@ -27,6 +28,17 @@ var color_cycle = function (step) {
 var connector_colors = color_cycle(0.3);
 
 var connect_elements = function (source_id, target_id) {
+    connector_queue.push([source_id, target_id]);
+};
+
+var draw_connectors = function () {
+    while (connector_queue.length > 0) {
+        var connection = connector_queue.shift();
+        draw_connection.apply(null, connection);
+    }
+};
+
+var draw_connection = function (source_id, target_id) {
     try {
         jsPlumb.connect({ source: source_id,
                           target: target_id,
@@ -43,6 +55,7 @@ var connect_elements = function (source_id, target_id) {
 var lookup_duns_numbers = function (entity_name) {
     duns_search_active = true;
     $("#cancel-search-btn").show();
+    $("#no-results").hide();
     $("#duns-results").empty();
     $("#names-results").empty();
 	$.ajax("/duns/" + entity_name,
@@ -59,14 +72,20 @@ var build_duns_result_element = function (duns) {
 
 var display_duns_numbers = function (data, text_status, xhr) {
 	if (data.constructor == Array) {
-		for (var idx = 0; idx < data.length; idx++) {
-			var duns = data[idx];
-            var duns_element = build_duns_result_element(duns);
-            $("#duns-results").prepend(duns_element);
-            duns_element.show("Slide");
-		}
-        if (duns_search_active) {
-            lookup_names(data);
+        if (data.length == 0) {
+            duns_search_active = false;
+            $("#cancel-search-btn").hide();
+            $("#no-results").show();
+        } else {
+            for (var idx = 0; idx < data.length; idx++) {
+                var duns = data[idx];
+                var duns_element = build_duns_result_element(duns);
+                $("#duns-results").prepend(duns_element);
+                duns_element.show("Slide");
+            }
+            if (duns_search_active) {
+                lookup_names(data);
+            }
         }
 	}
 };
@@ -100,14 +119,18 @@ var lookup_names = function (duns_numbers) {
             }
         }
         if (duns_search_active) {
-            setTimeout(function(){ lookup_names(duns_numbers); }, 1000);
+            lookup_names(duns_numbers);
         }
     };
 
 	if (duns == null) {
         duns_search_active = false;
-        $("#cancel-search-btn").hide();
         // Cancel crawling animation
+        setTimeout(function(){ 
+                draw_connectors(); 
+                $("#cancel-search-btn").hide();
+            }, 
+            1000);
     } else {
         $.ajax("/duns/" + duns,
                { data: "q=",

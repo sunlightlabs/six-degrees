@@ -1,6 +1,7 @@
 
 div#results {
 	vertical-align: top;
+	font-family: sans-serif;
 }
 
 div#duns-results, div#names-results {
@@ -27,4 +28,19 @@ img#progress-spinner {
 	width: 1em;
 	height: 1em;
 	margin: auto auto;
+}
+
+div#no-results {
+	margin: 0.5em 5em;
+	padding: 0.5em;
+	background-color: #FF7373;
+	border: #A60000 3pt solid;
+}
+
+div#no-results-text {
+	text-align: center;
+	margin: auto auto;
+	font-weight: bold;
+	color: white;
+	width: 40%;
 }
