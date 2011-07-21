@@ -1,0 +1,13 @@
+gunicorn.conf.py
+local_settings.py
+*.pyc
+bin/
+src/
+lib/
+TAGS
+*.sql
+*.json
+*.zip
+*.swp
+*.swo
+*.xlsx

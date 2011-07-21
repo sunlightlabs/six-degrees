@@ -1,0 +1,30 @@
+
+div#results {
+	vertical-align: top;
+}
+
+div#duns-results, div#names-results {
+	vertical-align: top;
+	display: inline-block;
+	width: 45%;
+}
+
+div.duns-result, div.names-result {
+	padding: 0.25em;
+	margin: 3px;
+}
+
+div.duns-result {
+	width: 15em;
+	background-color: rgb(255, 200, 180);
+}
+
+div.names-result {
+	background-color: rgb(180, 200, 255);
+}
+
+img#progress-spinner {
+	width: 1em;
+	height: 1em;
+	margin: auto auto;
+}

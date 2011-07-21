@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block head %}
+{% endblock %}
+{% block body %}
+	<input type="text" id="entity-name" value="General Electric">
+	<button id="show-entity-btn">Find</button>
+	<button id="cancel-search-btn">
+		<img id="progress-spinner" src="/media/images/spinner3-black.gif"> 
+		Cancel
+	</button>
+
+	<div id="results">
+		<div id="duns-results">
+		</div>
+		<div id="names-results">
+		</div>
+	</div>
+
+	<div id="duns-result-tmpl">
+		<div class="duns-result" style="display: none;">
+			<span class="duns-result"></span>
+		</div>
+	</div>
+	<div id="names-result-tmpl">
+		<div class="names-result" style="display: none;">
+			<span class="names-result"></span>
+		</div>
+	</div>
+{% endblock %}
+
