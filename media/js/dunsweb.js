@@ -1,5 +1,5 @@
 var duns_search_active = null;
-var connector_queue = [];
+var connectors = [];
 
 function delay (ms, f, args) {
     setTimeout(function(){ f.apply(undefined, args); }, ms);
@@ -12,8 +12,23 @@ function byte2hex (n) {
 function rgb2hex (r,g,b) {
     return '#' + byte2hex(r) + byte2hex(g) + byte2hex(b);
 }
-var hue = function (n,phase) { return Math.sin(32*n+phase) * 127 + 128; }
-var color = function (n) { return rgb2hex(hue(n, 0), hue(n, 2), hue(n, 4)); }
+var pastel_hue = function (n,phase) { 
+    return Math.sin(0.8979777 * n + phase) * 45 + 205; 
+};
+var deep_hue = function (n, phase) {
+    return Math.sin(0.8979777 * n + phase) * 95 + 155;
+}
+var color = function (n, hue_func) { 
+    return rgb2hex(hue_func(n, 0), 
+                   hue_func(n, 2), 
+                   hue_func(n, 4)); 
+};
+var pastel_color = function (n) {
+    return color(n, pastel_hue);
+};
+var deep_color = function (n) { 
+    return color(n, deep_hue);
+};
 var color_cycle = function (step) {
     return {
         'state': 0, 
@@ -27,25 +42,30 @@ var color_cycle = function (step) {
 };
 var connector_colors = color_cycle(0.3);
 
-var connect_elements = function (source_id, target_id) {
-    connector_queue.push([source_id, target_id]);
+var connect_elements = function (source_id, target_id, color) {
+    connectors.push([source_id, target_id, color]);
 };
 
 var draw_connectors = function () {
-    while (connector_queue.length > 0) {
-        var connection = connector_queue.shift();
+    var gap_width = $("#names-results").attr("clientLeft") - $("#duns-results").attr("clientLeft") + $("#duns-results").attr("clientWidth");
+    var shape = (gap_width < 450) ? "Straight" : "Bezier";
+
+    for (var idx = 0; idx < connectors.length; idx++) {
+        var connection = $.extend([], connectors[idx]);
+        connection.push(shape);
         draw_connection.apply(null, connection);
     }
 };
 
-var draw_connection = function (source_id, target_id) {
+var draw_connection = function (source_id, target_id, color, shape) {
     try {
         jsPlumb.connect({ source: source_id,
                           target: target_id,
                           anchors: [ "RightMiddle", "LeftMiddle" ],
                           endpoint: "Blank",
+                          connector: shape,
                           paintStyle: { lineWidth: 2, 
-                                        strokeStyle: connector_colors.next() } 
+                                        strokeStyle: color } 
                         });
     } catch (err) {
         console.log(err);
@@ -54,10 +74,16 @@ var draw_connection = function (source_id, target_id) {
         
 var lookup_duns_numbers = function (entity_name) {
     duns_search_active = true;
+    $("#search-form > *:enabled").attr("disabled", "true");
     $("#cancel-search-btn").show();
     $("#no-results").hide();
     $("#duns-results").empty();
     $("#names-results").empty();
+
+    var name_element_id = "names-result-" + Base64.encode(name);
+    var name_element = build_names_result_element(name, name_element_id);
+    $("#names-results").prepend(name_element);
+
 	$.ajax("/duns/" + entity_name,
 			{ data: "q=",
               success: display_duns_numbers });
@@ -75,12 +101,14 @@ var display_duns_numbers = function (data, text_status, xhr) {
         if (data.length == 0) {
             duns_search_active = false;
             $("#cancel-search-btn").hide();
+            $("#search-form > *:disabled").attr("disabled", "false");
             $("#no-results").show();
         } else {
             for (var idx = 0; idx < data.length; idx++) {
                 var duns = data[idx];
                 var duns_element = build_duns_result_element(duns);
-                $("#duns-results").prepend(duns_element);
+                $(duns_element).css("background-color", pastel_color(data.length - idx - 1));
+                $("#duns-results").append(duns_element);
                 duns_element.show("Slide");
             }
             if (duns_search_active) {
@@ -109,13 +137,15 @@ var lookup_names = function (duns_numbers) {
             if (existing_results.length == 0) {
                 var name_element = build_names_result_element(name, 
                                                               name_element_id);
-                $("#names-results").prepend(name_element);
+                $("#names-results").append(name_element);
                 name_element.show();
                 delay(500, connect_elements, ["duns-result-" + duns, 
-                                              name_element_id]);
+                                              name_element_id,
+                                              deep_color(duns_numbers.length)]);
             } else {
                 connect_elements("duns-result-" + duns,
-                                 name_element_id);
+                                 name_element_id,
+                                 deep_color(duns_numbers.length));
             }
         }
         if (duns_search_active) {
@@ -128,6 +158,7 @@ var lookup_names = function (duns_numbers) {
         // Cancel crawling animation
         setTimeout(function(){ 
                 draw_connectors(); 
+                $("#search-form > *").attr("disabled", null);
                 $("#cancel-search-btn").hide();
             }, 
             1000);
@@ -138,9 +169,29 @@ var lookup_names = function (duns_numbers) {
 	}
 };
 
+function ReplaceableCall (delay, proc) {
+    var that = this;
+    that.timeout = null;
+
+    var do_proc = function () {
+        that.timeout = null;
+        proc();
+    };
+
+    var guarded_proc = function () {
+        if (that.timeout != null) {
+            clearTimeout(that.timeout);
+        }
+        that.timeout = setTimeout(do_proc, delay);
+    };
+
+    return guarded_proc;
+}
 
 $(document).ready(function(){
-    jsPlumb.setRenderMode(jsPlumb.VML);
+    var resize_deadline = null;
+
+    jsPlumb.setRenderMode(jsPlumb.Canvas);
     $("#cancel-search-btn").hide();
     $("#cancel-search-btn").click(function(){
         duns_search_active = false;
@@ -150,4 +201,10 @@ $(document).ready(function(){
 		$("#overlay").show("Appear");
    		lookup_duns_numbers($("#entity-name").val());
     });
+
+    var resize_handler = ReplaceableCall(500, function(evt){ 
+        $("._jsPlumb_connector").remove();
+        draw_connectors();
+    });
+    $(window).resize(resize_handler);
 });
