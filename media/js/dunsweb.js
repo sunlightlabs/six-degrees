@@ -19,9 +19,9 @@ var deep_hue = function (n, phase) {
     return Math.sin(0.8979777 * n + phase) * 95 + 155;
 }
 var color = function (n, hue_func) { 
-    return rgb2hex(hue_func(n, 0), 
-                   hue_func(n, 2), 
-                   hue_func(n, 4)); 
+    return rgb2hex(hue_func(n, 0 + n), 
+                   hue_func(n, 2 + n), 
+                   hue_func(n, 4 + n)); 
 };
 var pastel_color = function (n) {
     return color(n, pastel_hue);
@@ -203,10 +203,8 @@ $(document).ready(function(){
     });
 
     var rate_limited_redraw = ReplaceableCall(200, draw_connectors);
-
-    var resize_handler = function(evt){ 
+    $(window).resize(function(evt){ 
         $("._jsPlumb_connector").remove();
         rate_limited_redraw();
-    };
-    $(window).resize(resize_handler);
+    });;
 });
