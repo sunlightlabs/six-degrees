@@ -53,7 +53,7 @@ var draw_connectors = function () {
     for (var idx = 0; idx < connectors.length; idx++) {
         var connection = $.extend([], connectors[idx]);
         connection.push(shape);
-        draw_connection.apply(null, connection);
+        delay(0, draw_connection, connection);
     }
 };
 
@@ -202,9 +202,11 @@ $(document).ready(function(){
    		lookup_duns_numbers($("#entity-name").val());
     });
 
-    var resize_handler = ReplaceableCall(500, function(evt){ 
+    var rate_limited_redraw = ReplaceableCall(200, draw_connectors);
+
+    var resize_handler = function(evt){ 
         $("._jsPlumb_connector").remove();
-        draw_connectors();
-    });
+        rate_limited_redraw();
+    };
     $(window).resize(resize_handler);
 });
