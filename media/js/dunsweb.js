@@ -101,7 +101,7 @@ var display_duns_numbers = function (data, text_status, xhr) {
         if (data.length == 0) {
             duns_search_active = false;
             $("#cancel-search-btn").hide();
-            $("#search-form > *:disabled").attr("disabled", "false");
+            $("#search-form > *:disabled").attr("disabled", null);
             $("#no-results").show();
         } else {
             for (var idx = 0; idx < data.length; idx++) {

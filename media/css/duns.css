@@ -8,10 +8,15 @@ body {
 	z-index: 9;
 }
 
+div#sidebar {
+	display: inline-block;
+}
+
 div#results {
+	display: inline-block;
+	width: 1000px;
 	vertical-align: top;
 	font-family: sans-serif;
-	margin: 3em 0 0 0;
 }
 
 div#duns-results, div#names-results {
@@ -26,7 +31,7 @@ div.duns-result, div.names-result {
 }
 
 div.duns-result {
-	width: 15em;
+	width: 8em;
 	background-color: rgb(255, 200, 180);
 }
 
