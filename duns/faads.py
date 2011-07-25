@@ -3,7 +3,6 @@
 from contextlib import closing
 from django.db.models import Max
 from duns.models import FAADS, DUNS, Name
-from utils import join_field_list
 from psycopg2.extras import DictCursor
 
 
@@ -18,11 +17,13 @@ class Importer(object):
         raw_duns = dbrow['duns_no'].strip()
 
         if raw_rcpt_name != '' and raw_duns != '':
-            rcpt_name = Name(raw_rcpt_name)
-            rcpt_name.save()
+            (rcpt_name, created) = Name.objects.get_or_create(name=raw_rcpt_name)
+            if created:
+                rcpt_name.save()
 
-            duns = DUNS(raw_duns)
-            duns.save()
+            (duns, created) = DUNS.objects.get_or_create(number=raw_duns)
+            if created:
+                duns.save()
 
             faads = FAADS(data_commons_id=dbrow['id'])
             faads.unique_transaction_id = dbrow['unique_transaction_id']

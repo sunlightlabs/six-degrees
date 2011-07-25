@@ -3,7 +3,9 @@ from django.db import models
 
 class Name(models.Model):
     name = models.CharField("DUNS-linked name", max_length=255,
-                            blank=False, null=False, primary_key=True)
+                            blank=False, null=False, unique=True)
+    def __repr__(self):
+        return "<Name(%s)>" % self.name
 
 
 class DUNS(models.Model):
@@ -11,7 +13,9 @@ class DUNS(models.Model):
         verbose_name = 'DUNS Number'
 
     number = models.CharField("DUNS Number", max_length=13,
-                              blank=False, null=False, primary_key=True)
+                              blank=False, null=False, unique=True)
+    def __repr__(self):
+        return "<Duns(%s)>" % self.number
 
 
 class FAADS(models.Model):

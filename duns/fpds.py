@@ -18,17 +18,20 @@ class Importer(object):
         raw_parent_duns = dbrow['parentdunsnumber'].strip()
 
         if raw_vndr_name != '' and raw_duns != '':
-            vndr_name = Name(raw_vndr_name)
-            vndr_name.save()
+            (vndr_name, created) = Name.objects.get_or_create(name=raw_vndr_name)
+            if created:
+                vndr_name.save()
 
-            duns = DUNS(raw_duns)
-            duns.save()
+            (duns, created) = DUNS.objects.get_or_create(number=raw_duns)
+            if created:
+                duns.save()
 
             if raw_parent_duns == '':
                 parent_duns = None
             else:
-                parent_duns = DUNS(raw_parent_duns)
-                parent_duns.save()
+                (parent_duns, created) = DUNS.objects.get_or_create(number=raw_parent_duns)
+                if created:
+                    parent_duns.save()
 
             fpds = FPDS(data_commons_id=dbrow['id'])
             fpds.unique_transaction_id = dbrow['unique_transaction_id']
