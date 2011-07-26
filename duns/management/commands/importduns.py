@@ -1,5 +1,5 @@
-import duns.faads
-import duns.fpds
+from duns.faads import FAADSImporter
+from duns.fpds import FPDSImporter
 from django.core.management.base import NoArgsCommand
 from optparse import make_option
 import settings
@@ -29,14 +29,14 @@ class Command(NoArgsCommand):
         src_db = psycopg2.connect(**settings.DATACOMMONS_DB)
 
         if not fpds_only:
-            faads_importer = duns.faads.Importer(src_db)
+            faads_importer = FAADSImporter(src_db)
             if max_records:
                 faads_importer.step(max_records)
             else:
                 faads_importer.run(stepsize=5000)
 
         if not faads_only:
-            fpds_importer = duns.fpds.Importer(src_db)
+            fpds_importer = FPDSImporter(src_db)
             if max_records:
                 fpds_importer.step(max_records)
             else:

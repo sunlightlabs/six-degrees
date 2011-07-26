@@ -40,7 +40,7 @@ class FPDS(models.Model):
 
     unique_transaction_id = models.CharField('unique_transaction_id', max_length=255, blank=False, null=False)
     data_commons_id = models.IntegerField('data commons id', blank=False, null=False, primary_key=True)
-    duns = models.ForeignKey(DUNS, related_name='fpds', blank=False, null=False)
+    duns = models.ForeignKey(DUNS, related_name='fpds', blank=False, null=True)
     duns_parent = models.ForeignKey(DUNS, related_name='fpds_parent', blank=False, null=True)
     company_name = models.ForeignKey(Name, related_name='fpds', blank=False, null=False)
     fiscal_year = models.IntegerField("Fiscal year", blank=False, null=False)
