@@ -1,7 +1,22 @@
 
 body {
+    margin: 0;
+    padding: 0;
 	background-color: #dfdfdf;
 	background-color: #999;
+}
+
+header#marquee {
+    font-family: sans-serif;
+    background-color: #545454;
+    color: white;
+    border-bottom: 1px solid black;
+    padding: 0.3em;
+}
+
+header#marquee span.number {
+    color: #F9BFAB;
+    font-size: 1.1em;
 }
 
 #show-entity-btn {

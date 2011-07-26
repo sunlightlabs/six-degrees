@@ -14,6 +14,18 @@ from duns.models import FPDS, FAADS, DUNS, Name
 from utils import parseint
 
 
+def index(request):
+    contract_count = FPDS.objects.count()
+    grant_count = FAADS.objects.count()
+    name_count = Name.objects.count()
+    duns_count = DUNS.objects.count()
+
+    return render_to_response('duns-index.html',
+                              { 'contract_count': contract_count,
+                                'grant_count': grant_count,
+                                'name_count': name_count,
+                                'duns_count': duns_count })
+
 def search_by_name(entity_name):
     try:
         nm = Name.objects.get(name=entity_name)

@@ -18,5 +18,5 @@ urlpatterns = patterns('',
     url(r'^$', 'index'),
     url(r'^duns/(?P<duns_number>[0-9]+)', 'duns.views.lookup_by_duns_number'),
     url(r'^duns/(?P<entity_name>[-_ \ta-zA-Z0-9]+)', 'duns.views.lookup_by_name'),
-    url(r'^duns$', direct_to_template, {'template': 'duns-index.html'})
+    url(r'^duns$', 'duns.views.index'),
 )
