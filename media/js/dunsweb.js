@@ -82,7 +82,7 @@ var lookup_duns_numbers = function (entity_name) {
 
     var name_element_id = "names-result-" + Base64.encode(name);
     var name_element = build_names_result_element(name, name_element_id);
-    $("#names-results").prepend(name_element);
+    $("#names-results").append(name_element);
 
 	$.ajax("/duns/" + entity_name,
 			{ data: "q=",
@@ -109,7 +109,7 @@ var display_duns_numbers = function (data, text_status, xhr) {
                 var duns_element = build_duns_result_element(duns);
                 $(duns_element).css("background-color", pastel_color(data.length - idx - 1));
                 $("#duns-results").append(duns_element);
-                duns_element.show("Slide");
+                duns_element.show("fade", {direction: "left"}, 1500);
             }
             if (duns_search_active) {
                 lookup_names(data);
@@ -128,7 +128,7 @@ var build_names_result_element = function (name, id) {
 var lookup_names = function (duns_numbers) {
 	var duns = duns_numbers.shift();
     var display_entity_names= function (data, text_status, xhr) {
-        for (var idx = 0; idx < data.length; idx++) {
+		for (var idx = data.length - 1; idx >= 0; idx--) {
             var name = data[idx].trim().toUpperCase();
             var name_element_id = "names-result-" + Base64.encode(name);
 
@@ -138,7 +138,7 @@ var lookup_names = function (duns_numbers) {
                 var name_element = build_names_result_element(name, 
                                                               name_element_id);
                 $("#names-results").append(name_element);
-                name_element.show();
+                name_element.show("fade", {direction: "right"}, 1500);
                 delay(500, connect_elements, ["duns-result-" + duns, 
                                               name_element_id,
                                               deep_color(duns_numbers.length)]);
@@ -222,6 +222,7 @@ $(document).ready(function(){
     if (q != null) {
         q = q.trim();
         if (q.length > 0) {
+   			$("#entity-name").val(q);
             lookup_duns_numbers(q);
         }
     }   
