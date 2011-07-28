@@ -57,6 +57,7 @@ class Importer(object):
 
             for row in rows:
                 self.record(row)
+                self.progress_tick()
 
                 data_commons_id = int(row['id'])
                 if data_commons_id > self.checkpoint:
@@ -64,6 +65,18 @@ class Importer(object):
 
     def run(self, stepsize):
         """Imports all new records. Reports progress after every `stepsize` rows."""
-        while True:
-            self.step(stepsize)
+        try:
+            while True:
+                self.step(stepsize)
+                self.progress_step()
+        except Importer.Done:
+            self.progress_done()
 
+    def progress_done(self):
+        print "Done."
+
+    def progress_step(self):
+        print "Checkpoint: %d" % self.checkpoint
+
+    def progress_tick(self):
+        pass
