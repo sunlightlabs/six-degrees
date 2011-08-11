@@ -71,103 +71,113 @@ var draw_connection = function (source_id, target_id, color, shape) {
         console.log(err);
     }
 };
-        
-var lookup_duns_numbers = function (entity_name) {
-    duns_search_active = true;
-    $("#search-form > *:enabled").attr("disabled", "true");
-    $("#cancel-search-btn").show();
-    $("#no-results").hide();
-    $("#duns-results").empty();
-    $("#names-results").empty();
 
-    var name_element_id = "names-result-" + Base64.encode(name);
-    var name_element = build_names_result_element(name, name_element_id);
-    $("#names-results").append(name_element);
+function Crawler (options) {
+	if (this === window) 
+		return new Crawler(options);
 
-	$.ajax("/duns/" + entity_name,
-			{ data: "q=",
-              success: display_duns_numbers });
-};
+	var defaults = {
+		delay: 100,
+		done_after_stop: true
+	};
+	var opts = $.extend(true, {}, defaults);
+        opts = $.extend(true, opts, options || {});
 
-var build_duns_result_element = function (duns) {
-    var duns_element = $($("#duns-result-tmpl").html());
-    duns_element.attr('id', 'duns-result-' + duns);
-    $("span.duns-result", duns_element).text(duns);
-    return duns_element;
-};    
+	var that = this;
+	var started = false;
+	var done = false;
+	var stopped = false;
+	var duns_queue = [];
+	var name_queue = [];
+	var duns_results = [];
+	var name_results = [];
 
-var display_duns_numbers = function (data, text_status, xhr) {
-	if (data.constructor == Array) {
-        if (data.length == 0) {
-            duns_search_active = false;
-            $("#cancel-search-btn").hide();
-            $("#search-form > *:disabled").attr("disabled", null);
-            $("#no-results").show();
-        } else {
-            for (var idx = 0; idx < data.length; idx++) {
-                var duns = data[idx];
-                var duns_element = build_duns_result_element(duns);
-                $(duns_element).css("background-color", pastel_color(data.length - idx - 1));
-                $("#duns-results").append(duns_element);
-                duns_element.show("fade", {direction: "left"}, 1500);
-            }
-            if (duns_search_active) {
-                lookup_names(data);
-            }
-        }
+	var recv_results = function (data, queue, results, result_type) {
+		if (stopped) {
+			finish();
+			return;
+		}
+
+		for (var idx = 0; idx < data.length; idx++) {
+			var _ = data[idx];
+			if (results.indexOf(_) == -1) {
+				queue.push(_);
+				results.push(_);
+				$(that).trigger('result', [_, result_type]);
+			}
+		}
+		process_queues();
+	};
+
+	var recv_names = function (data, text_status, xhr) {
+		recv_results(data, name_queue, name_results, 'name');
+	};
+
+	var recv_duns = function (data, text_status, xhr) {
+		recv_results(data, duns_queue, duns_results, 'duns');
+	};
+
+	var search_by_duns = function (duns) {
+		$.ajax("/duns/" + duns,
+				{ data: "q=",
+                  success: recv_names });
+	};
+
+	var search_by_name = function (name) {
+		$.ajax("/duns/" + name,
+				{ data: "q=",
+                  success: recv_duns });
+	};
+
+	var process_queues = function () {
+		if (duns_queue.length > 0) {
+			var duns = duns_queue.shift();
+			setTimeout(function(){ search_by_duns(duns); },
+					   opts.delay);
+		} else if (name_queue.length > 0) {
+			var name = name_queue.shift();
+			setTimeout(function(){ search_by_name(name); },
+					   opts.delay);
+		} else {
+			finish();
+		}
+	};
+
+	var finish = function () {
+		done = true;
+		$(that).trigger('done', duns_results, name_results);
 	}
-};
 
-var build_names_result_element = function (name, id) {
-    var name_element = $($("#names-result-tmpl").html());
-    name_element.attr('id', id);
-    $("span.names-result", name_element).text(name);
-    return name_element;
-};    
-
-var lookup_names = function (duns_numbers) {
-	var duns = duns_numbers.shift();
-    var display_entity_names= function (data, text_status, xhr) {
-		for (var idx = data.length - 1; idx >= 0; idx--) {
-            var name = data[idx].trim().toUpperCase();
-            var name_element_id = "names-result-" + Base64.encode(name);
-
-            var selector = "#" + name_element_id;
-            var existing_results = $(selector);
-            if (existing_results.length == 0) {
-                var name_element = build_names_result_element(name, 
-                                                              name_element_id);
-                $("#names-results").append(name_element);
-                name_element.show("fade", {direction: "right"}, 1500);
-                delay(500, connect_elements, ["duns-result-" + duns, 
-                                              name_element_id,
-                                              deep_color(duns_numbers.length)]);
-            } else {
-                connect_elements("duns-result-" + duns,
-                                 name_element_id,
-                                 deep_color(duns_numbers.length));
-            }
-        }
-        if (duns_search_active) {
-            lookup_names(duns_numbers);
-        }
-    };
-
-	if (duns == null) {
-        duns_search_active = false;
-        // Cancel crawling animation
-        setTimeout(function(){ 
-                draw_connectors(); 
-                $("#search-form > *").attr("disabled", null);
-                $("#cancel-search-btn").hide();
-            }, 
-            1000);
-    } else {
-        $.ajax("/duns/" + duns,
-               { data: "q=",
-                 success: display_entity_names });
+	this.stop = function () {
+		stopped = true;
+		$(that).trigger('stop');
 	}
-};
+
+	this.start = function (seed, seed_type) {
+		if (started || stopped || done ) {
+			console.log("Crawler objects are not restartable.");
+			return;
+		}
+
+		if (seed_type.toLowerCase() == 'duns') {
+			duns_queue.push(seed);
+			started = true;
+			process_queues();
+		} else if (seed_type.toLowerCase() == 'name') {
+			name_queue.push(seed);
+			started = true;
+			process_queues();
+		} else {
+			console.log('Invalid crawler seed type: ' + seed_type);
+		}
+	};
+
+	this.is_running = function () { return started && !done; }
+	this.is_started = function () { return started; }
+	this.is_done = function () { return started && done; }
+
+	return that;
+}
 
 function ReplaceableCall (delay, proc) {
     var that = this;
@@ -200,7 +210,7 @@ $(document).ready(function(){
         }
         return b;
     })(window.location.search.substr(1).split('&'));
-
+	
     jsPlumb.setRenderMode(jsPlumb.Canvas);
     $("#cancel-search-btn").hide();
     $("#cancel-search-btn").click(function(){
@@ -209,7 +219,23 @@ $(document).ready(function(){
     });
 	$("#show-entity-btn").click(function(){
 		$("#overlay").show("Appear");
-   		lookup_duns_numbers($("#entity-name").val());
+		var crawler = Crawler({delay: 100});
+		var ui_ready = function () {
+			$("#cancel-search-btn").hide();
+		};
+		$(crawler).bind('stop', ui_ready);
+		$(crawler).bind('done', ui_ready);
+		$("#cancel-search-btn").click(function(){
+			crawler.stop();
+		});
+		$(crawler).bind('result', function (event, result, result_type) {
+
+			console.log(result_type + ': ' + result);
+		});
+
+   		var seed = $("#entity-name").val();
+		crawler.start(seed, 'name');
+		$("#cancel-search-btn").show();
     });
 
     var rate_limited_redraw = ReplaceableCall(200, draw_connectors);
