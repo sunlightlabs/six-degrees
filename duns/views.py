@@ -61,7 +61,9 @@ def lookup_by_name(request, entity_name):
             duns_list = []
         else:
             cache.set(cache_key, duns_list)
-    json_string = json.dumps(duns_list)
+    json_string = json.dumps({'querytype': 'name',
+                              'query': entity_name,
+                              'results': duns_list})
     return HttpResponse(json_string, mimetype='application/json')
 
 
@@ -75,5 +77,7 @@ def lookup_by_duns_number(request, duns_number):
             name_list = []
         else:
             cache.set(cache_key, name_list)
-    json_string = json.dumps(name_list)
+    json_string = json.dumps({'querytype': 'duns',
+                              'query': duns_number,
+                              'results': name_list})
     return HttpResponse(json_string, mimetype='application/json')
