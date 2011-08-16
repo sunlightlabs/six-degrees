@@ -110,42 +110,6 @@ function TraerGraph (root, options) {
     // nodes & particle arrays for each end of the link.
     var edges = [];
 
-    this.draw = function (processing) {
-        physics.tick();
-        if (particles.length > 1)
-            update_centroid();
-        processing.translate(opts.width / 2, opts.height / 2);
-        processing.scale(centroid.z());
-        processing.translate(-centroid.x(), -centroid.y());
-
-        processing.background(opts.background.r, opts.background.g, opts.background.b);
-
-        for (var idx = 0; idx < edges.length; idx++) {
-            var a_prtcl = particles[edges[idx][0]];
-            var b_prtcl = particles[edges[idx][1]];
-            set_color(edges[idx][0], deep_hue, processing.stroke);
-            processing.line(a_prtcl.position.x, a_prtcl.position.y,
-                            b_prtcl.position.x, b_prtcl.position.y);
-        }
-
-        for (var idx = 0; idx < particles.length; idx++) {
-            var prtcl = particles[idx];
-            var cx = prtcl.position.x,
-                cy = prtcl.position.y;
-            processing.noStroke();
-            set_color(idx, (idx % 2 == 1) ? deep_hue : pastel_hue, processing.fill);
-            processing.ellipse(cx,
-                               cy,
-                               opts.node_size * 5,
-                               opts.node_size * 5);
-            processing.fill(0, 0, 0, 255);
-            processing.ellipse(cx,
-                               cy,
-                               opts.node_size,
-                               opts.node_size);
-        }
-    };
-
     var update_centroid = function () {
         var x_min = 999999.9,
             x_max = -999999.9,
@@ -221,6 +185,54 @@ function TraerGraph (root, options) {
         append_node(root, {near: {x: 0, y: 0}});
     };
 
+    this.sketch_proc = function (processing) {
+        processing.draw = function(){
+            physics.tick();
+            if (particles.length > 1)
+                update_centroid();
+            processing.translate(opts.width / 2, opts.height / 2);
+            processing.scale(centroid.z());
+            processing.translate(-centroid.x(), -centroid.y());
+
+            processing.background(opts.background.r, opts.background.g, opts.background.b);
+
+            // Draw edges
+            for (var idx = 0; idx < edges.length; idx++) {
+                var a_prtcl = particles[edges[idx][0]];
+                var b_prtcl = particles[edges[idx][1]];
+                set_color(edges[idx][0], deep_hue, processing.stroke);
+                processing.line(a_prtcl.position.x, a_prtcl.position.y,
+                                b_prtcl.position.x, b_prtcl.position.y);
+            }
+
+            // Draw nodes
+            for (var idx = 0; idx < particles.length; idx++) {
+                var prtcl = particles[idx];
+                var cx = prtcl.position.x,
+                    cy = prtcl.position.y;
+                processing.noStroke();
+                set_color(idx, (idx % 2 == 1) ? deep_hue : pastel_hue, processing.fill);
+                processing.ellipse(cx,
+                                   cy,
+                                   opts.node_size * 5,
+                                   opts.node_size * 5);
+                processing.fill(0, 0, 0, 255);
+                processing.ellipse(cx,
+                                   cy,
+                                   opts.node_size,
+                                   opts.node_size);
+            }
+        };
+        processing.setup = function(){
+            processing.frameRate(24);
+            processing.colorMode(processing.RGB);
+            processing.size(opts.width, opts.height);
+        };
+        processing.mouseClicked = function(){
+            $(that).trigger('mouseClicked', [processing.mouseX, processing.mouseY]);
+        };
+    };
+
     reset();
 }
 
@@ -279,21 +291,13 @@ $(document).ready(function(){
                                           target: canvas,
                                           width: canvas.width,
                                           height: canvas.height});
-        var p = new Processing(canvas,
-                               function (p) {
-                                   p.setup = function(){
-                                       p.frameRate(24);
-                                       p.colorMode(p.RGB);
-                                       p.size(canvas.width, canvas.height);
-                                   };
-                                   p.mouseClicked = function(){
-                                       var node = traer.node_at(p.mouseX, p.mouseY);
-                                       if (node != null) {
-                                           retrieve_node_details(node);
-                                       }
-                                   };
-                                   p.draw = function(){ traer.draw(p); };
-                               });
+        var p = new Processing(canvas, traer.sketch_proc);
+        $(traer).bind('mouseClicked', function (event, x, y) {
+            var node = traer.node_at(x, y);
+            if (node != null) {
+                retrieve_node_details(node);
+            }
+        });
         var ui_ready = function () {
             $("#cancel-search-btn").hide();
         };
