@@ -27,6 +27,11 @@ div#sidebar {
 	display: inline-block;
 }
 
+span#node-name {
+    width: 400px;
+    clear: both;
+}
+
 div#results {
 	display: inline-block;
 	width: 1000px;

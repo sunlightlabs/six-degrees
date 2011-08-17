@@ -516,7 +516,9 @@ ParticleSystem.prototype.makeParticle = function() {
 		x = arguments[1];
 		y = arguments[2];
 		z = arguments[3];
-	}
+	} else if (arguments.length === 1) {
+        mass = arguments[0];
+    }
 	var p = new Particle(mass);
 	p.position.set(x, y, z);
 	this.particles.push(p);
