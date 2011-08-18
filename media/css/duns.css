@@ -25,11 +25,14 @@ header#marquee span.number {
 
 div#sidebar {
 	display: inline-block;
+    width: 400px;
 }
 
-span#node-name {
-    width: 400px;
-    clear: both;
+div#node-details {
+}
+
+div.node-name {
+    padding: 0.7em 0 0 1em;
 }
 
 div#results {

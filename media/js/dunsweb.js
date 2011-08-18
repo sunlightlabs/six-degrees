@@ -99,7 +99,19 @@ function ReplaceableCall (delay, proc) {
 }
 
 function retrieve_node_details (node) {
-    $("#node-name").text(node);
+    $("#node-details *").remove();
+    function show_node (n) {
+        var name_elem = $("<div></div>");
+        name_elem.addClass("node-name");
+        name_elem.text(n.value);
+        $("#node-details").append(name_elem);
+    }
+    if (node.parent_node != null)
+        show_node(node.parent_node);
+    show_node(node);
+    for (var idx = 0; idx < node.children.length; idx++) {
+        show_node(node.children[idx]);
+    }
 }
 
 $(document).ready(function(){
@@ -129,7 +141,7 @@ $(document).ready(function(){
         var canvas = document.getElementById("graph");
         $(canvas).attr("width", 1000);
         $(canvas).attr("height", 700);
-        var crawler = new Crawler({delay: 500});
+        var crawler = new Crawler({delay: 50});
         var graph = new ParticleGraph(seed, {node_size: 5,
                                              target: canvas,
                                              width: canvas.width,
@@ -160,7 +172,12 @@ $(document).ready(function(){
         $(crawler).bind('noderesult', function (event, node_value, result_type) {
         });
         $(crawler).bind('linkresult', function (event, link_value, result_type) {
-            graph.add_link(link_value[0].toUpperCase(), link_value[1].toUpperCase());
+            var inverted_type = (result_type == 'name') ? 'duns' : 'name';
+            var a = { type: inverted_type,
+                      value: link_value[0].toUpperCase() },
+                b = { type: result_type,
+                      value: link_value[1].toUpperCase() };
+            graph.add_link(a, b);
        });
 
         crawler.start(seed, 'name');
