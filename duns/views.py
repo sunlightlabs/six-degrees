@@ -13,6 +13,9 @@ from django.core.cache import cache
 from duns.models import FPDS, FAADS, DUNS, Name
 from utils import parseint
 
+NameBlacklist = [
+    'NO DATA FROM D AND B'
+]
 
 def index(request):
     contract_count = FPDS.objects.count()
@@ -27,6 +30,9 @@ def index(request):
                                 'duns_count': duns_count })
 
 def search_by_name(entity_name):
+    if entity_name.upper() in NameBlacklist:
+        return None
+
     try:
         nm = Name.objects.get(name=entity_name)
         grants = nm.faads.all()

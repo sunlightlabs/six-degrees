@@ -1,3 +1,37 @@
+function generate_edges (root, depth, callback) {
+    for (var a = 0; a < root.children.length; a++) {
+        var child = root.children[a];
+        for (var b = 0; b < child.children.length; b++) {
+            var grandchild = child.children[b];
+            callback.call(null, root, child, grandchild, depth);
+            generate_edges(grandchild, depth + 1, callback);
+        }
+    }
+}
+
+function Centroid3D (smoothness, width, height) {
+    Centroid3D.superclass.constructor.call(this, smoothness);
+    this.width = width;
+    this.height = height;
+}
+extend(Centroid3D, Smoother3D);
+Centroid3D.prototype.recalc = function (particles) {
+    var extents = particles.reduce(function(state, curr, idx, arr) {
+            return { x_min: Math.min(state.x_min, curr.position.x),
+                     y_min: Math.min(state.y_min, curr.position.y),
+                     x_max: Math.max(state.x_max, curr.position.x),
+                     y_max: Math.max(state.y_max, curr.position.y) };
+         },
+         { x_min: 999999, y_min: 999999,
+           x_max: -999999, y_max: -999999 });
+
+    var dx = extents.x_max - extents.x_min,
+        dy = extents.y_max - extents.y_min;
+    this.x0.setTarget(extents.x_min + 0.5 * dx);
+    this.y0.setTarget(extents.y_min + 0.5 * dy);
+    this.z0.setValue(Math.min(1, this.width / (dx * 1.15), this.height / (dy * 1.15)));
+};
+
 function ParticleGraph (root, options) {
     if (this === window)
         return new ParticleGraph(options);
@@ -16,7 +50,7 @@ function ParticleGraph (root, options) {
 
     var that = this;
     var physics = new ParticleSystem(0.0, 0.8);
-    var centroid = new Smoother3D(0.8);
+    var centroid = new Centroid3D(20.8, opts.width, opts.height);
     var x_positioning_ratio = opts.width / opts.height;
     var y_positioning_ratio = opts.height / opts.width;
     // nodes and particles are parallel arrays where the particle at a given
@@ -26,27 +60,6 @@ function ParticleGraph (root, options) {
     // edges is an array of 2-element arrays that hold the offset into the
     // nodes & particle arrays for each end of the link.
     var edges = [];
-
-    var update_centroid = function () {
-        var x_min = 999999.9,
-            x_max = -999999.9,
-            y_min = 999999.9,
-            y_max = -999999.9;
-
-        for (var idx = 0; idx < particles.length; idx++) {
-            var pos = particles[idx].position;
-            x_min = Math.min(x_min, pos.x);
-            x_max = Math.max(x_max, pos.x);
-            y_min = Math.min(y_min, pos.y);
-            y_max = Math.max(y_max, pos.y);
-        }
-
-        var dx = x_max - x_min,
-            dy = y_max - y_min;
-        centroid.x0.setTarget(x_min + 0.5 * dx);
-        centroid.y0.setTarget(y_min + 0.5 * dy);
-        centroid.z0.setValue(Math.min(1, opts.width / dx - 0.1, opts.height / dy - 0.1));
-    };
 
     this.node_at = function (x, y) {
         var x1 = (x + centroid.x() - (opts.width / 2)) * (1/centroid.z());
@@ -123,7 +136,7 @@ function ParticleGraph (root, options) {
 
             physics.tick();
             if (particles.length > 1)
-                update_centroid();
+                centroid.recalc(particles);
             processing.translate(opts.width / 2, opts.height / 2);
             processing.scale(centroid.z());
             processing.translate(-centroid.x(), -centroid.y());
