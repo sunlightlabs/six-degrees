@@ -43,6 +43,27 @@ Centroid3D.prototype.recalc = function (particles) {
     this.z0.setValue(Math.min(1, this.width / (dx * 1.15), this.height / (dy * 1.15)));
 };
 
+function ParticleGraphNode (type, value, parent_node, particle) {
+    this.type = type;
+    this.value = value;
+    this.parent_node = parent_node;
+    this.children = [];
+    this.particle = particle;
+    if (parent_node != null) {
+        parent_node.children.push(this);
+    }
+};
+
+ParticleGraphNode.prototype.path_to_root = function () {
+    var path = [];
+    var node = this;
+    while (node != null) {
+        path.push(node);
+        node = node.parent_node;
+    }
+    return path;
+};
+
 function ParticleGraph (root, options) {
     if (this === window)
         return new ParticleGraph(options);
@@ -69,6 +90,7 @@ function ParticleGraph (root, options) {
     var root_node = null;
     var particles = [];
     var edges = [];
+    var selected_node = null;
 
     this.node_at = function (x, y) {
         var x1 = (x + centroid.x() - (opts.width / 2)) * (1/centroid.z());
@@ -87,26 +109,19 @@ function ParticleGraph (root, options) {
     this.add_link = function (a, b) {
         var a_node = find_node_by_value(root_node, a.value);
         var b_node = find_node_by_value(root_node, b.value);
-        var new_node = null;
         if ((a_node == null) && (b_node == null)) {
-            throw "The universe is falling apart: " + a + ", " + b;
+            throw "The universe is falling apart: both nodes returned by the query are 'new'."
         } else if (a_node == null) {
-            a_node = add_node(a.type, a.value, b_node);
-            console.log("A is new");
+            throw "The universe is falling apart: the 'A' node is 'new'.";
         } else if (b_node == null) {
             b_node = add_node(b.type, b.value, a_node);
         }
     };
 
     var add_root_node = function (name_value) {
-        root_node = {
-            type: 'name',
-            value: name_value,
-            children: [],
-            parent_node: null,
-            particle: physics.makeParticle(4, centroid.x(), centroid.y(), 0)
-        };
-        particles.push(root_node.particle);
+        var particle = physics.makeParticle(4, centroid.x(), centroid.y(), 0);
+        particles.push(particle);
+        root_node = new ParticleGraphNode('name', name_value, null, particle);
         return root_node;
     };
 
@@ -129,30 +144,16 @@ function ParticleGraph (root, options) {
                                      nearx + xdir,
                                      neary + ydir,
                                      0);
-        var node = { 
-            type: 'name',
-            value: name_value, 
-            children: [], 
-            parent_node: duns_node,
-            particle: p 
-        };
-        duns_node.children.push(node);
 
+        var node = new ParticleGraphNode('name', name_value, duns_node, p);
         var grandparent_node = node.parent_node.parent_node;
         add_edge(node.particle, grandparent_node.particle);
-
         particles.push(p);
         return node;
     };
 
     var add_duns_node = function (duns_value, name_node) {
-        var node = {
-            type: 'duns',
-            value: duns_value,
-            children: [],
-            parent_node: name_node
-        };
-        name_node.children.push(node);
+        var node = new ParticleGraphNode('duns', duns_value, name_node, null);
         return node;
     };
 
@@ -183,6 +184,36 @@ function ParticleGraph (root, options) {
         centroid.z0.setValue(1.0);
     };
 
+    var selected_particles = function () {
+        var selection = [];
+        if (selected_node != null) {
+            selection = selected_node.path_to_root()
+                                     .filter(function(n){return n.type=='name';})
+                                     .map(function(n){return n.particle;});
+            return selection;
+
+            for (var i = 0; i < selected_node.children.length; i++) {
+                var child = selected_node.children[i];
+                for (var j = 0; j < child.children.length; j++) {
+                    // We want the grandchild because we're not showing DUNS nodes.
+                    var grandchild = child.children[j];
+                    selection.push(grandchild.particle);
+                }
+            }
+        }
+        return selection;
+    };
+
+    var selected_edges = function (particle_selection) {
+        var edge_selection = [];
+        for (var idx = 0; idx < edges.length; idx++) {
+            if (particle_selection.indexOf(edges[idx][0]) >= 0) {
+                edge_selection.push(edges[idx]);
+            }
+        }
+        return edge_selection;
+    };
+
     this.sketch_proc = function (processing) {
         processing.draw = function(){
             if ((processing.frameCount > 60) && (processing.frameRate < 24)) 
@@ -197,22 +228,29 @@ function ParticleGraph (root, options) {
 
             processing.background(opts.background.r, opts.background.g, opts.background.b);
 
+            var particle_selection = selected_particles();
+            var edge_selection = selected_edges(particle_selection);
+
             // Draw edges
             for (var idx = 0; idx < edges.length; idx++) {
+                if (edge_selection.indexOf(edges[idx]) >= 0)
+                    continue;
                 var a_prtcl = edges[idx][0],
                     b_prtcl = edges[idx][1];
-                set_color(idx, deep_hue, processing.stroke);
+                processing.stroke(0xe0, 0xe0, 0xe0, 0xff);
                 processing.line(a_prtcl.position.x, a_prtcl.position.y,
                                 b_prtcl.position.x, b_prtcl.position.y);
             }
 
             // Draw nodes
             for (var idx = 0; idx < particles.length; idx++) {
+                if (particle_selection.indexOf(particles[idx]) >= 0) 
+                    continue;
                 var prtcl = particles[idx];
                 var cx = prtcl.position.x,
                     cy = prtcl.position.y;
                 processing.noStroke();
-                set_color(idx, (idx % 2 == 1) ? deep_hue : pastel_hue, processing.fill);
+                processing.fill(0xe0, 0xe0, 0xe0, 0xff);
                 processing.ellipse(cx,
                                    cy,
                                    opts.node_size * 5,
@@ -224,6 +262,42 @@ function ParticleGraph (root, options) {
                                    opts.node_size);
             }
 
+            // Draw selected edges
+            for (var idx = 0; idx < edge_selection.length; idx++) {
+                var a_prtcl = edge_selection[idx][0],
+                    b_prtcl = edge_selection[idx][1],
+                    prtcl_idx = particle_selection.indexOf(b_prtcl);
+                set_color(prtcl_idx, deep_hue, function(r,g,b){
+                              processing.strokeWeight(2 - centroid.z());
+                              processing.stroke(r,g,b);
+                              processing.fill(r,g,b);
+                          });
+                processing.line(a_prtcl.position.x, a_prtcl.position.y,
+                                b_prtcl.position.x, b_prtcl.position.y);
+            }
+
+            // Draw selected nodes
+            for (var idx = 0; idx < particle_selection.length; idx++) {
+                var prtcl = particle_selection[idx];
+                var cx = prtcl.position.x,
+                    cy = prtcl.position.y;
+                set_color(idx, deep_hue, function(r,g,b){
+                              processing.strokeWeight(0);
+                              processing.stroke(r,g,b);
+                              processing.fill(r,g,b);
+                          });
+                processing.ellipse(cx,
+                                   cy,
+                                   opts.node_size * 5,
+                                   opts.node_size * 5);
+                processing.fill(0, 0, 0, 255);
+                processing.ellipse(cx,
+                                   cy,
+                                   opts.node_size,
+                                   opts.node_size);
+            }
+
+
             // Draw text for number of nodes, edges
             processing.scale(1/centroid.z());
             processing.text('Nodes: ' + particles.length, 
@@ -232,14 +306,22 @@ function ParticleGraph (root, options) {
             processing.text('Edges: ' + edges.length, 
                             -opts.width / 2 + 5, 
                             -opts.height / 2 + 40);
+            processing.text('Z-scale: ' + centroid.z(),
+                            -opts.width / 2 + 5,
+                            -opts.height / 2 + 55);
         };
         processing.setup = function(){
-            processing.frameRate(24);
+            processing.frameRate(60);
             processing.colorMode(processing.RGB);
             processing.size(opts.width, opts.height);
         };
         processing.mouseClicked = function(){
             $(that).trigger('mouseClicked', [processing.mouseX, processing.mouseY]);
+            var node = that.node_at(processing.mouseX, processing.mouseY);
+            if (node != null) {
+                selected_node = node;
+                $(that).trigger('nodeSelected', [node]);
+            }
         };
     };
 

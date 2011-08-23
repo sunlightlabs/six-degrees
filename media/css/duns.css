@@ -28,7 +28,8 @@ div#sidebar {
     width: 400px;
 }
 
-div#node-details {
+ul#node-details {
+    list-style-type: none;
 }
 
 div.node-name {
@@ -60,6 +61,14 @@ div.duns-result {
 
 div.names-result {
 	background-color: rgb(180, 200, 255);
+}
+
+li.duns-value, li.name-value {
+    padding: 0.2em 0;
+    font-family: sans-serif;
+    font-size: 90%;
+    font-weight: 600;
+    color: #f0f0f0;
 }
 
 img#progress-spinner {

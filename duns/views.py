@@ -14,7 +14,18 @@ from duns.models import FPDS, FAADS, DUNS, Name
 from utils import parseint
 
 NameBlacklist = [
-    'NO DATA FROM D AND B'
+    'NO DATA FROM D AND B',
+    'ENVIRONMENTAL PROTECTION AGENCY',
+    'MISCELLANEOUS FOREIGN CONTRACT',
+    'MISCELLANEOUS FOREIGN CONTRACTORS',
+    'J & B TRUCK REPAIR SERVICE',
+]
+
+DUNSBlacklist = [
+    '0000000000000', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
+    '5571630810000', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
+    '7777777770000',
+    '1234567870000'  # 'MISCELLANEOUS FOREIGN CONTRACTORS', & others
 ]
 
 def index(request):
@@ -46,6 +57,9 @@ def search_by_name(entity_name):
 
 
 def search_by_duns(duns_number):
+    if duns_number in DUNSBlacklist:
+        return None
+
     try:
         duns = DUNS.objects.get(number=duns_number)
         grants = duns.faads.all()
