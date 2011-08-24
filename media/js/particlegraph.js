@@ -142,6 +142,7 @@ function ParticleGraph (root, options) {
         var particle = physics.makeParticle(4, centroid.x(), centroid.y(), 0);
         particles.push(particle);
         root_node = new ParticleGraphNode('name', name_value, null, particle);
+        selected_node = root_node;
         return root_node;
     };
 
@@ -302,7 +303,7 @@ function ParticleGraph (root, options) {
                 var prtcl = particle_selection[idx];
                 var cx = prtcl.position.x,
                     cy = prtcl.position.y;
-                set_color(idx, deep_hue, function(r,g,b){
+                set_color(particle_selection.length - idx, deep_hue, function(r,g,b){
                               processing.strokeWeight(0);
                               processing.stroke(r,g,b);
                               processing.fill(r,g,b);
@@ -316,12 +317,24 @@ function ParticleGraph (root, options) {
                                    cy,
                                    opts.node_size,
                                    opts.node_size);
+
+                set_color(particle_selection.length - idx, deep_hue, function(r,g,b){
+                              processing.strokeWeight(1);
+                              processing.stroke(r,g,b);
+                              processing.fill(r,g,b);
+                          });
+                processing.translate(cx + opts.node_size * 2, cy - opts.node_size * 2);
+                processing.scale(1/z_scale() * 1.4);
+                processing.text(find_node_by_particle(root_node, prtcl).value, 0, 0);
+                processing.scale(z_scale() / 1.4);
+                processing.translate(-cx - opts.node_size * 2, -cy + opts.node_size * 2);
             }
 
 
             // Draw text for number of nodes, edges
             processing.scale(1/z_scale());
             processing.translate(-drag_adjust.x, -drag_adjust.y);
+            processing.fill(0, 0, 0, 255);
             processing.text('Nodes: ' + particles.length, 
                             (-opts.width / 2) + 5, 
                             (-opts.height / 2) + 25);
