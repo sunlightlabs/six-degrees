@@ -82,7 +82,7 @@ function ParticleGraph (root, options) {
 
     var that = this;
     var physics = new ParticleSystem(0.0, 0.8);
-    var centroid = new Centroid3D(20.8, opts.width, opts.height);
+    var centroid = new Centroid3D(1.8, opts.width, opts.height);
     var x_positioning_ratio = opts.width / opts.height;
     var y_positioning_ratio = opts.height / opts.width;
     // nodes and particles are parallel arrays where the particle at a given
@@ -92,13 +92,33 @@ function ParticleGraph (root, options) {
     var edges = [];
     var selected_node = null;
 
+    var drag_adjust = new Vector(0, 0, 0);
+    var zoom_level = null;
+
+    var z_scale = function () {
+        if (zoom_level == null) {
+            return centroid.z();
+        } else {
+            return zoom_level;
+        }
+    };
+
+    this.offset_for_position = function (x, y) {
+        var x1 = ((x - centroid.x()) * z_scale()) + drag_adjust.x + (opts.width / 2);
+        var y1 = ((y - centroid.y()) * z_scale()) + drag_adjust.y + (opts.height / 2);
+        return new Vector(x1, y1, 0);
+    };
+
+    this.position_for_offset = function (x, y) {
+        var x1 = (x + centroid.x() - drag_adjust.x - (opts.width / 2)) * (1/z_scale());
+        var y1 = (y + centroid.y() - drag_adjust.y - (opts.height / 2)) * (1/z_scale());
+        return new Vector(x1, y1, 0);
+    };
+
     this.node_at = function (x, y) {
-        var x1 = (x + centroid.x() - (opts.width / 2)) * (1/centroid.z());
-        var y1 = (y + centroid.y() - (opts.height / 2)) * (1/centroid.z());
+        var position = that.position_for_offset(x, y);
         for (var idx = 0; idx < particles.length; idx++) {
-            var x2 = particles[idx].position.x;
-            var y2 = particles[idx].position.y;
-            var distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            var distance = position.distanceTo(particles[idx].position);
             if (distance <= opts.node_size * 5) {
                 return find_node_by_particle(root_node, particles[idx]);
             }
@@ -223,7 +243,8 @@ function ParticleGraph (root, options) {
             if (particles.length > 1)
                 centroid.recalc(particles);
             processing.translate(opts.width / 2, opts.height / 2);
-            processing.scale(centroid.z());
+            processing.translate(drag_adjust.x, drag_adjust.y);
+            processing.scale(z_scale());
             processing.translate(-centroid.x(), -centroid.y());
 
             processing.background(opts.background.r, opts.background.g, opts.background.b);
@@ -268,7 +289,7 @@ function ParticleGraph (root, options) {
                     b_prtcl = edge_selection[idx][1],
                     prtcl_idx = particle_selection.indexOf(b_prtcl);
                 set_color(prtcl_idx, deep_hue, function(r,g,b){
-                              processing.strokeWeight(2 - centroid.z());
+                              processing.strokeWeight(1.25/z_scale());
                               processing.stroke(r,g,b);
                               processing.fill(r,g,b);
                           });
@@ -299,21 +320,41 @@ function ParticleGraph (root, options) {
 
 
             // Draw text for number of nodes, edges
-            processing.scale(1/centroid.z());
+            processing.scale(1/z_scale());
+            processing.translate(-drag_adjust.x, -drag_adjust.y);
             processing.text('Nodes: ' + particles.length, 
                             (-opts.width / 2) + 5, 
                             (-opts.height / 2) + 25);
             processing.text('Edges: ' + edges.length, 
                             -opts.width / 2 + 5, 
                             -opts.height / 2 + 40);
-            processing.text('Z-scale: ' + centroid.z(),
+            processing.text('Z-scale: ' + z_scale(),
                             -opts.width / 2 + 5,
                             -opts.height / 2 + 55);
         };
         processing.setup = function(){
-            processing.frameRate(60);
+            processing.frameRate(24);
             processing.colorMode(processing.RGB);
             processing.size(opts.width, opts.height);
+            $(opts.target).mousewheel(function (evt, delta) {
+                if (zoom_level == null) {
+                    zoom_level = centroid.z();
+                } else {
+                    zoom_level += (0.1 * delta);
+                }
+                if (zoom_level < 0.25) {
+                    zoom_level = 0.25;
+                } else if (zoom_level > 2.75) {
+                    zoom_level = 2.75;
+                }
+
+                var mouse_position = that.position_for_offset(processing.mouseX, processing.mouseY);
+                var diff = new Vector(root_node.particle.position);
+                diff.subtract(mouse_position);
+
+                drag_adjust.add(diff);
+                evt.preventDefault();
+            });
         };
         processing.mouseClicked = function(){
             $(that).trigger('mouseClicked', [processing.mouseX, processing.mouseY]);
@@ -322,6 +363,24 @@ function ParticleGraph (root, options) {
                 selected_node = node;
                 $(that).trigger('nodeSelected', [node]);
             }
+        };
+
+        var drag_x = null,
+            drag_y = null;
+        processing.mousePressed = function(){
+            drag_x = processing.mouseX;
+            drag_y = processing.mouseY;
+        };
+        processing.mouseReleased = function(){
+            drag_x = null;
+            drag_y = null;
+        };
+        processing.mouseDragged = function(){
+            drag_adjust.add(new Vector(processing.mouseX - drag_x,
+                                       processing.mouseY - drag_y,
+                                       0));
+            drag_x = processing.mouseX;
+            drag_y = processing.mouseY;
         };
     };
 
