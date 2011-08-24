@@ -57,7 +57,6 @@ $(document).ready(function(){
         return b;
     })(window.location.search.substr(1).split('&'));
     
-    jsPlumb.setRenderMode(jsPlumb.Canvas);
     $("#cancel-search-btn").hide();
     $("#cancel-search-btn").click(function(){
         $("#cancel-search-btn").hide();
@@ -110,12 +109,6 @@ $(document).ready(function(){
         crawler.start(seed, 'name');
         $("#cancel-search-btn").show();
     });
-
-    var rate_limited_redraw = ReplaceableCall(200, draw_connectors);
-    $(window).resize(function(evt){ 
-        $("._jsPlumb_connector").remove();
-        rate_limited_redraw();
-    });;
 
     var q = query_params['q'];
     if (q != null) {
