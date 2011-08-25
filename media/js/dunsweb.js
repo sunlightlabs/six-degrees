@@ -70,7 +70,7 @@ $(document).ready(function(){
         var canvas = document.getElementById("graph");
         $(canvas).attr("width", 1000);
         $(canvas).attr("height", 700);
-        var crawler = new Crawler({delay: 50});
+        var crawler = new Crawler({delay: 100});
         var graph = new ParticleGraph(seed, {node_size: 5,
                                              target: canvas,
                                              width: canvas.width,

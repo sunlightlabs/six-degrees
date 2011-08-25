@@ -1,3 +1,18 @@
+function sorensen_index (a, b) {
+    function bigrams (s) {
+        var results = [];
+        for (var i = 0; i < s.length - 1; i++) {
+          results.push(s[i] + s[i+1]);
+        }
+        return results;
+    }
+    var A = bigrams(a),
+        B = bigrams(b),
+        C = A.filter(function(_){ return B.indexOf(_) >= 0; });
+    var index = (2 * C.length) / (A.length + B.length);
+    return index;
+}
+
 function find_node_by_value (root, value) {
     return find_node(root, function (n) { return (n.value == value); });
 }
@@ -50,7 +65,10 @@ function ParticleGraphNode (type, value, parent_node, particle) {
     this.children = [];
     this.particle = particle;
     if (parent_node != null) {
+        this.depth = parent_node.depth + 1;
         parent_node.children.push(this);
+    } else {
+        this.depth = 1;
     }
 };
 
@@ -81,7 +99,7 @@ function ParticleGraph (root, options) {
         opts = $.extend(true, opts, options || {});
 
     var that = this;
-    var physics = new ParticleSystem(0.0, 0.8);
+    var physics = new ParticleSystem(0.0, 0.6);
     var centroid = new Centroid3D(1.8, opts.width, opts.height);
     var x_positioning_ratio = opts.width / opts.height;
     var y_positioning_ratio = opts.height / opts.width;
@@ -119,7 +137,7 @@ function ParticleGraph (root, options) {
         var position = that.position_for_offset(x, y);
         for (var idx = 0; idx < particles.length; idx++) {
             var distance = position.distanceTo(particles[idx].position);
-            if (distance <= opts.node_size * 5) {
+            if (distance <= opts.node_size * 5 * z_scale()) {
                 return find_node_by_particle(root_node, particles[idx]);
             }
         }
@@ -161,14 +179,15 @@ function ParticleGraph (root, options) {
             ydir = cdx / Math.abs(cdx) * y_positioning_ratio * (yrnd / Math.abs(yrnd)) + yrnd;
 
         var scale = Math.sqrt(Math.max(1, particles.length)),
-            p = physics.makeParticle(1 + (2/scale),
+            p = physics.makeParticle(1 + 2/duns_node.depth,
                                      nearx + xdir,
                                      neary + ydir,
                                      0);
 
         var node = new ParticleGraphNode('name', name_value, duns_node, p);
         var grandparent_node = node.parent_node.parent_node;
-        add_edge(node.particle, grandparent_node.particle);
+        add_edge(node.particle, grandparent_node.particle, 
+				 sorensen_index(node.value, grandparent_node.value));
         particles.push(p);
         return node;
     };
@@ -186,13 +205,14 @@ function ParticleGraph (root, options) {
         }
     }
 
-    var add_edge = function (a_prtcl, b_prtcl) {
+    var add_edge = function (a_prtcl, b_prtcl, dampening) {
+		dampening = Math.min(0.9, dampening);
         physics.makeSpring(a_prtcl, b_prtcl,
                            opts.edge_strength * 1.5, opts.edge_strength * 0.5,
-                           opts.node_size * 30);
+                           opts.node_size * 30 * (1 - dampening));
         for (var idx = 0; idx < particles.length; idx++) {
             physics.makeAttraction(a_prtcl, particles[idx], 
-                                   -opts.spacer_strength,
+                                   -opts.spacer_strength * (1 - dampening),
                                    opts.node_size * 2);
         }
         edges.push([a_prtcl, b_prtcl]);
@@ -318,13 +338,10 @@ function ParticleGraph (root, options) {
                                    opts.node_size,
                                    opts.node_size);
 
-                set_color(particle_selection.length - idx, deep_hue, function(r,g,b){
-                              processing.strokeWeight(1);
-                              processing.stroke(r,g,b);
-                              processing.fill(r,g,b);
-                          });
                 processing.translate(cx + opts.node_size * 2, cy - opts.node_size * 2);
                 processing.scale(1/z_scale() * 1.4);
+                processing.noStroke();
+                processing.fill(0x20);
                 processing.text(find_node_by_particle(root_node, prtcl).value, 0, 0);
                 processing.scale(z_scale() / 1.4);
                 processing.translate(-cx - opts.node_size * 2, -cy + opts.node_size * 2);
