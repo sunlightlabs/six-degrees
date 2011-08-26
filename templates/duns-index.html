@@ -4,7 +4,7 @@
 {% endblock %}
 {% block body %}
 
-    <header id="marquee">
+    <div id="marquee">
     <span class="number">{{ name_count|intcomma }}</span> names 
     &amp;
     <span class="number">{{ duns_count|intcomma }}</span> DUNS numbers 
@@ -12,37 +12,33 @@
     <span class="number">{{ contract_count|intcomma }}</span> contracts 
     &amp;
     <span class="number">{{ grant_count|intcomma }}</span> grants
-    </header>
-
-    <div id="sidebar">
-        <span id="search-form">
-            <input type="text" id="entity-name" value="General Electric">
-            <button id="show-entity-btn">Find</button>
-        </span>
-        <button id="cancel-search-btn">
-            <img id="progress-spinner" src="/media/images/spinner3-black.gif"> 
-            Cancel
-        </button>
-		<br>
-		<ul id="node-details">
-		</ul>
     </div>
 
-	<div id="results">
-		<div id="no-results" style="display: none;">
-			<div id="no-results-text">
-				Your search returned no results.
-			</div>
-		</div>
-		<div id="duns-results">
-		</div>
-		<div id="names-results">
-		</div>
-		<div id="results-graph-container">
-		</div>
-		<canvas id="graph">
-		</canvas>
-	</div>
+    <div id="content">
+        <div id="sidebar">
+            <span id="search-form">
+                <input type="text" id="entity-name" value="General Electric">
+                <button id="show-entity-btn">Find</button>
+            </span>
+            <button id="cancel-search-btn">
+                <img id="progress-spinner" src="/media/images/spinner3-black.gif"> 
+                Cancel
+            </button>
+            <br>
+            <ul id="node-details">
+            </ul>
+        </div>
+
+        <div id="results">
+            <div id="no-results" style="display: none;">
+                <div id="no-results-text">
+                    Your search returned no results.
+                </div>
+            </div>
+            <canvas id="graph">
+            </canvas>
+        </div>
+    </div>
 
 	<div id="duns-result-tmpl">
 		<div class="duns-result" style="display: none;">
