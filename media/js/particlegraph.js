@@ -348,19 +348,16 @@ function ParticleGraph (root, options) {
             }
 
 
-            // Draw text for number of nodes, edges
-            processing.scale(1/z_scale());
-            processing.translate(-drag_adjust.x, -drag_adjust.y);
-            processing.fill(0, 0, 0, 255);
-            processing.text('Nodes: ' + particles.length, 
-                            (-opts.width / 2) + 5, 
-                            (-opts.height / 2) + 25);
-            processing.text('Edges: ' + edges.length, 
-                            -opts.width / 2 + 5, 
-                            -opts.height / 2 + 40);
-            processing.text('Z-scale: ' + z_scale(),
-                            -opts.width / 2 + 5,
-                            -opts.height / 2 + 55);
+			// Draw the zoom control
+			processing.resetMatrix();
+			processing.fill(0xf0, 0xf0, 0xf0, 0x80);
+            processing.stroke(0xd0, 0xd0, 0xd0, 0xff);
+			processing.strokeWeight(3);
+			processing.triangle(5, 30, 165, 15, 165, 45);
+			var zoom_pct = (z_scale() - 0.25) / 2.5,
+				zoom_pct_x_offset = Math.round(160 * zoom_pct);
+			processing.line(5 + zoom_pct_x_offset, 15,
+					        5 + zoom_pct_x_offset, 45);
         };
         processing.setup = function(){
             processing.frameRate(24);
