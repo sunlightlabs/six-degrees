@@ -400,7 +400,7 @@ function ParticleGraph (root, options) {
                 if (zoom_level == null) {
                     zoom_level = centroid.z();
                 } else {
-                    zoom_level += 0.05 * delta,
+                    zoom_level += bounded(zoom_level * 0.1, 0.025, 0.08) * delta;
 					zoom_level = bounded(zoom_level,
 						                  opts.zoom_min,
 										  opts.zoom_max);
