@@ -35,6 +35,16 @@ function find_node (root, pred) {
     }
 }
 
+function bounded (x, min, max) {
+	if (x < min) {
+		return min;
+	} else if (x > max) {
+		return max;
+	} else {
+		return x;
+	}
+}
+
 function Centroid3D (smoothness, width, height) {
     Centroid3D.superclass.constructor.call(this, smoothness);
     this.width = width;
@@ -89,11 +99,17 @@ function ParticleGraph (root, options) {
     var defaults = {
         width: 1000,
         height: 700,
+		zoom_min: 0.10,
+		zoom_max: 1.5,
         mass: 100,
         edge_strength: 0.007,
         spacer_strength: 1200,
-        node_size: 3,
-        background: {r: 99, g: 99, b: 99}
+        node_size: 5,
+        background: {r: 99, g: 99, b: 99},
+		zoom_ctl_x: 5,
+		zoom_ctl_y: 5,
+		zoom_ctl_width: 165,
+		zoom_ctl_height: 25
     };
     var opts = $.extend(true, {}, defaults);
         opts = $.extend(true, opts, options || {});
@@ -120,6 +136,31 @@ function ParticleGraph (root, options) {
             return zoom_level;
         }
     };
+
+	var handle_zoom_control_click = function (mx, my) {
+		if ((mx >= opts.zoom_ctl_x) && (my >= opts.zoom_ctl_y) && (mx <= opts.zoom_ctl_x + opts.zoom_ctl_width) && (my <= opts.zoom_ctl_y + opts.zoom_ctl_height)) {
+			var zoom_pct = (mx - opts.zoom_ctl_x) / opts.zoom_ctl_width;
+			zoom_level = bounded(opts.zoom_min + (opts.zoom_max - opts.zoom_min) * zoom_pct, 
+					             opts.zoom_min, opts.zoom_max);
+			return true;
+		} else {
+			return false;
+		}
+	};
+
+	var draw_zoom_control = function (processing) {
+		processing.resetMatrix();
+		processing.fill(0xf0, 0xf0, 0xf0, 0x80);
+		processing.stroke(0xd0, 0xd0, 0xd0, 0xff);
+		processing.strokeWeight(3);
+		processing.triangle(opts.zoom_ctl_x, opts.zoom_ctl_y + opts.zoom_ctl_height,
+							opts.zoom_ctl_x + opts.zoom_ctl_width, opts.zoom_ctl_y,
+							opts.zoom_ctl_x + opts.zoom_ctl_width, opts.zoom_ctl_y + opts.zoom_ctl_height);
+		var zoom_pct = (z_scale() - opts.zoom_min) / (opts.zoom_max - opts.zoom_min),
+			zoom_pct_x_offset = Math.round(opts.zoom_ctl_width * zoom_pct);
+		processing.line(opts.zoom_ctl_x + zoom_pct_x_offset, opts.zoom_ctl_height - (opts.zoom_ctl_height * zoom_pct),
+						opts.zoom_ctl_x + zoom_pct_x_offset, opts.zoom_ctl_y + opts.zoom_ctl_height);
+	}
 
     this.offset_for_position = function (x, y) {
         var x1 = ((x - centroid.x()) * z_scale()) + drag_adjust.x + (opts.width / 2);
@@ -347,49 +388,44 @@ function ParticleGraph (root, options) {
                 processing.translate(-cx - opts.node_size * 2, -cy + opts.node_size * 2);
             }
 
-
-			// Draw the zoom control
-			processing.resetMatrix();
-			processing.fill(0xf0, 0xf0, 0xf0, 0x80);
-            processing.stroke(0xd0, 0xd0, 0xd0, 0xff);
-			processing.strokeWeight(3);
-			processing.triangle(5, 30, 165, 15, 165, 45);
-			var zoom_pct = (z_scale() - 0.25) / 2.5,
-				zoom_pct_x_offset = Math.round(160 * zoom_pct);
-			processing.line(5 + zoom_pct_x_offset, 15,
-					        5 + zoom_pct_x_offset, 45);
+			draw_zoom_control(processing);
         };
         processing.setup = function(){
             processing.frameRate(24);
             processing.colorMode(processing.RGB);
             processing.size(opts.width, opts.height);
             $(opts.target).mousewheel(function (evt, delta) {
+                var mouse_position1 = that.position_for_offset(processing.mouseX, processing.mouseY);
+
                 if (zoom_level == null) {
                     zoom_level = centroid.z();
                 } else {
-                    zoom_level += (0.1 * delta);
-                }
-                if (zoom_level < 0.25) {
-                    zoom_level = 0.25;
-                } else if (zoom_level > 2.75) {
-                    zoom_level = 2.75;
+                    zoom_level += 0.05 * delta,
+					zoom_level = bounded(zoom_level,
+						                  opts.zoom_min,
+										  opts.zoom_max);
                 }
 
-                var mouse_position = that.position_for_offset(processing.mouseX, processing.mouseY);
-                var diff = new Vector(root_node.particle.position);
-                diff.subtract(mouse_position);
-
-                drag_adjust.add(diff);
+				var offset_after_zoom = that.offset_for_position(mouse_position1.x, 
+					                                             mouse_position1.y);
+				var diff = new Vector((offset_after_zoom.x - processing.mouseX),
+					                  (offset_after_zoom.y - processing.mouseY),
+									  0);
+				drag_adjust.subtract(diff);
                 evt.preventDefault();
             });
         };
         processing.mouseClicked = function(){
-            $(that).trigger('mouseClicked', [processing.mouseX, processing.mouseY]);
-            var node = that.node_at(processing.mouseX, processing.mouseY);
-            if (node != null) {
-                selected_node = node;
-                $(that).trigger('nodeSelected', [node]);
-            }
+			if (handle_zoom_control_click(processing.mouseX, processing.mouseY)) {
+				event.preventDefault();
+			} else {
+				$(that).trigger('mouseClicked', [processing.mouseX, processing.mouseY]);
+				var node = that.node_at(processing.mouseX, processing.mouseY);
+				if (node != null) {
+					selected_node = node;
+					$(that).trigger('nodeSelected', [node]);
+				}
+			}
         };
 
         var drag_x = null,

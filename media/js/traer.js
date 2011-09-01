@@ -57,7 +57,7 @@ Vector.prototype.add = function(v) {
 		this.z += arguments[0].z;
 	}
 };
-Vector.prototype.substract = function(v) {
+Vector.prototype.subtract = function(v) {
 	var argc = arguments.length;
 	if (argc === 3) {
 		this.x -= arguments[0];
