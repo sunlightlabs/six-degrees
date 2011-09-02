@@ -504,6 +504,7 @@ ParticleSystem.prototype.setGravity = function () {
 	}
 };
 ParticleSystem.prototype.tick = function() {
+	this.tick_count += 1;
 	this.integrator.step(arguments.length === 0 ? 1 : arguments[0]);
 };
 ParticleSystem.prototype.makeParticle = function() {

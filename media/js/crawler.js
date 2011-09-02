@@ -109,9 +109,11 @@ function Crawler (options) {
         }
     };
 
-    this.is_running = function () { return started && !done; }
-    this.is_started = function () { return started; }
-    this.is_done = function () { return started && done; }
+    this.is_running = function () { return started && !done; };
+    this.is_started = function () { return started; };
+    this.is_done = function () { return started && done; };
+    this.name_queue_length = function () { return name_queue.length; };
+    this.duns_queue_length = function () { return duns_queue.length; };
 
     return that;
 }

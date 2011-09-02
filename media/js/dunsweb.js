@@ -72,14 +72,15 @@ $(document).ready(function(){
         $(canvas).attr("height", 700);
         var crawler = new Crawler({delay: 100});
         var graph = new ParticleGraph(seed, {node_size: 5,
+                                             frames_per_second: 24,
                                              target: canvas,
                                              width: canvas.width,
                                              height: canvas.height});
         var p = new Processing(canvas, graph.sketch_proc);
-        $(graph).bind('lowframerate', function (frame_rate) {
-            p.exit();
-            crawler.exit();
-            console.log("Stopped the crawler due to a low frame rate.");
+        $(graph).bind('lowframerate', function (event, frame_rate) {
+            setTimeout(graph.pause, 15 * 1000);
+            crawler.stop();
+            $("#low-frame-rate-warning").show();
         });
         $("#show-entity-btn").click(function(){
             p.exit();
@@ -89,11 +90,12 @@ $(document).ready(function(){
         });
         var ui_ready = function () {
             $("#cancel-search-btn").hide();
+            $("#low-frame-rate-warning").hide();
         };
-        $(crawler).bind('stop', ui_ready);
-        $(crawler).bind('done', ui_ready);
+        $(crawler).bind('done', function(){ ui_ready(); setTimeout(graph.pause, 15 * 1000); });
         $("#cancel-search-btn").click(function(){
             crawler.stop();
+			$("#search-queue-length").text("");
         });
         $(crawler).bind('noderesult', function (event, node_value, result_type) {
         });
@@ -104,6 +106,9 @@ $(document).ready(function(){
                 b = { type: result_type,
                       value: link_value[1].toUpperCase() };
             graph.add_link(a, b);
+
+			var search_queue_length = crawler.name_queue_length() + crawler.duns_queue_length();
+			$("#search-queue-length").text("Items left to search for: " + search_queue_length);
        });
 
         crawler.start(seed, 'name');

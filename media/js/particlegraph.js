@@ -99,6 +99,7 @@ function ParticleGraph (root, options) {
     var defaults = {
         width: 1000,
         height: 700,
+		frames_per_second: 24,
 		zoom_min: 0.10,
 		zoom_max: 1.5,
         mass: 100,
@@ -115,6 +116,8 @@ function ParticleGraph (root, options) {
         opts = $.extend(true, opts, options || {});
 
     var that = this;
+	var running = true;
+	var frame_rate_buffer = new MeanBuffer(opts.frames_per_second * 5);
     var physics = new ParticleSystem(0.0, 0.6);
     var centroid = new Centroid3D(1.8, opts.width, opts.height);
     var x_positioning_ratio = opts.width / opts.height;
@@ -296,14 +299,28 @@ function ParticleGraph (root, options) {
         return edge_selection;
     };
 
+	this.pause = function () {
+		running = false;
+	};
+
+	this.resume = function () {
+		running = true;
+	};
+
     this.sketch_proc = function (processing) {
         processing.draw = function(){
-            if ((processing.frameCount > 60) && (processing.frameRate < 24)) 
-                $(that).trigger('lowframerate', [processing.frameRate]);
+			if (running == true) {
+				frame_rate_buffer.put(processing.__frameRate);
+				if (processing.frameCount > opts.frames_per_second * 5) {
+					if (Math.round(frame_rate_buffer.mean()) < opts.frames_per_second / 3) {
+						$(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
+					}
+				}
 
-            physics.tick();
-            if (particles.length > 1)
-                centroid.recalc(particles);
+				physics.tick();
+				if (particles.length > 1)
+					centroid.recalc(particles);
+			}
             processing.translate(opts.width / 2, opts.height / 2);
             processing.translate(drag_adjust.x, drag_adjust.y);
             processing.scale(z_scale());
@@ -389,9 +406,10 @@ function ParticleGraph (root, options) {
             }
 
 			draw_zoom_control(processing);
+			processing.text('Frame rate:' + Math.round(frame_rate_buffer.mean()), 5, opts.height - 20);
         };
         processing.setup = function(){
-            processing.frameRate(24);
+            processing.frameRate(opts.frames_per_second);
             processing.colorMode(processing.RGB);
             processing.size(opts.width, opts.height);
             $(opts.target).mousewheel(function (evt, delta) {
