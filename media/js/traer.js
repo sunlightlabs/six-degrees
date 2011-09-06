@@ -15,69 +15,59 @@
  */
 function Vector() {
 	var argc = arguments.length;
-	if (argc === 3) {
+	if (argc === 2) {
 		this.x = arguments[0];
 		this.y = arguments[1];
-		this.z = arguments[2];
 	}
 	else if (argc === 1) {
 		this.x = arguments[0].x;
 		this.y = arguments[0].y;
-		this.z = arguments[0].z;
 	}
 	else {
 		this.x = 0;
 		this.y = 0;
-		this.z = 0;
 	}
 }
 Vector.prototype.set = function() {
 	var argc = arguments.length;
-	if (argc === 3) {
+	if (argc === 2) {
 		this.x = arguments[0];
 		this.y = arguments[1];
-		this.z = arguments[2];
 	}
 	else if (argc === 1) {
 		this.x = arguments[0].x;
 		this.y = arguments[0].y;
-		this.z = arguments[0].z;
 	}
 };
-Vector.prototype.add = function(v) {
-	var argc = arguments.length;
-	if (argc === 3) {
-		this.x += arguments[0];
-		this.y += arguments[1];
-		this.z += arguments[2];
-	}
-	else if (argc === 1) {
-		this.x += arguments[0].x;
-		this.y += arguments[0].y;
-		this.z += arguments[0].z;
-	}
+Vector.prototype.add = function(x, y) {
+	this.x += x;
+	this.y += y;
 };
 Vector.prototype.subtract = function(v) {
 	var argc = arguments.length;
-	if (argc === 3) {
+	if (argc === 2) {
 		this.x -= arguments[0];
 		this.y -= arguments[1];
-		this.z -= arguments[2];
 	}
 	else if (argc === 1) {
 		this.x -= arguments[0].x;
 		this.y -= arguments[0].y;
-		this.z -= arguments[0].z;
 	}
 };
-Vector.prototype.scale = function(f) { this.x *= f; this.y *= f; this.z *= f; };
+Vector.prototype.unit = function () {
+	var length = Math.max(Math.sqrt(this.x*this.x + this.y*this.y), 1);
+	if (length > 0) {
+		this.x /= length;
+		this.y /= length;
+	}
+};
+Vector.prototype.scale = function(f) { this.x *= f; this.y *= f; };
 Vector.prototype.distanceTo = function() { 
 	var argc = arguments.length;
 	if (argc === 3) {
 		var dx = this.x - arguments[0];
 		var dy = this.y - arguments[1];
-		var dz = this.z - arguments[2];
-		return Math.sqrt(dx*dx + dy*dy + dz*dz);
+		return Math.sqrt(dx*dx + dy*dy);
 	}
 	else if (argc === 1) {
 		return Math.sqrt(this.distanceSquaredTo(arguments[0]));
@@ -86,25 +76,20 @@ Vector.prototype.distanceTo = function() {
 Vector.prototype.distanceSquaredTo = function(v) {
 	var dx = this.x - v.x;
 	var dy = this.y - v.y;
-	var dz = this.z - v.z;
-	return dx*dx + dy*dy + dz*dz;
+	return dx*dx + dy*dy;
 };
-Vector.prototype.dot = function(v) { return this.x*v.x + this.y*v.y + this.z*v.z; };
-Vector.prototype.length = function() { return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z); };
-Vector.prototype.lengthSquared = function() { return this.x*this.x + this.y*this.y + this.z*this.z; };
-Vector.prototype.clear = function() { this.x = 0; this.y = 0; this.z = 0; };
-Vector.prototype.toString = function() { return '('+this.x+','+this.y+','+this.z+')'; };
-Vector.prototype.cross = function(v) {
-	return new Vector(
-		this.y*v.z - this.z*v.y,
-		this.x*v.z - this.z*v.x,
-		this.x*v.y - this.y*v.x
-	);
-};
+Vector.prototype.dot = function(v) { return this.x*v.x + this.y*v.y; };
+Vector.prototype.length = function() { return Math.sqrt(this.x*this.x + this.y*this.y); };
+Vector.prototype.lengthSquared = function() { return this.x*this.x + this.y*this.y; };
+Vector.prototype.clear = function() { this.x = 0; this.y = 0; };
+Vector.prototype.toString = function() { return '('+this.x+','+this.y+')'; };
 Vector.prototype.isZero = function() {
-	return this.x === 0 && this.y === 0 && this.z === 0;
+	return this.x === 0 && this.y === 0;
 };
-
+Vector.prototype.rotate = function (angle) {
+	this.x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
+	this.y = this.x * Math.sin(angle) + this.y * Math.cos(angle);
+};
 
 /**
  * A particle with position, velocity, and force vectors and mass
@@ -114,12 +99,10 @@ function Particle(mass) {
 	this.velocity = new Vector();
 	this.force = new Vector();
 	this.mass = mass;
-	this.fixed = false;
 	this.age = 0;
 	this.dead = false;
 }
 Particle.prototype.distanceTo = function(p) { return this.position.distanceTo(p.position); };
-Particle.prototype.makeFixed = function() { this.fixed = true; this.velocity.clear(); };
 Particle.prototype.reset = function() {
 	this.age = 0;
 	this.dead = false;
@@ -146,47 +129,37 @@ Spring.prototype.apply = function() {
 
 	var a = this.a;
 	var b = this.b;
-	if (!(this.on && (!a.fixed || !b.fixed))) {
+	if (!this.on) {
 		return;
 	}
 
 	var a2bx = a.position.x - b.position.x;
 	var a2by = a.position.y - b.position.y;
-	var a2bz = a.position.z - b.position.z;
 
-	var a2bd = Math.sqrt(a2bx*a2bx + a2by*a2by + a2bz*a2bz);
+	var a2bd = Math.sqrt(a2bx*a2bx + a2by*a2by);
 	if (a2bd === 0) {
 		a2bx = 0;
 		a2by = 0;
-		a2bz = 0;
 	}
 	else {
 		a2bx /= a2bd;
 		a2by /= a2bd;
-		a2bz /= a2bd;
 	}
 
 	var fspring = -1 * (a2bd - this.length) * this.constant;
 
 	var va2bx = a.velocity.x - b.velocity.x;
 	var va2by = a.velocity.y - b.velocity.y;
-	var va2bz = a.velocity.z - b.velocity.z;
 
-	var fdamping = -1 * this.damping * (a2bx*va2bx + a2by*va2by + a2bz*va2bz);
+	var fdamping = -1 * this.damping * (a2bx*va2bx + a2by*va2by);
 
 	var fr = fspring + fdamping;
 
 	a2bx *= fr;
 	a2by *= fr;
-	a2bz *= fr;
 
-	if (!a.fixed) {
-		a.force.add(a2bx, a2by, a2bz);
-	}
-	if (!b.fixed) {
-		b.force.add(-1 * a2bx, -1 * a2by, -1 * a2bz);
-	}
-
+	a.force.add(a2bx, a2by);
+	b.force.add(-1 * a2bx, -1 * a2by);
 };
 
 
@@ -205,44 +178,38 @@ Attraction.prototype.apply = function() {
 
 	// Skip if force is off or if both particles are fixed
 	var a = this.a, b = this.b;
-	if (!this.on || (a.fixed && b.fixed)) {
+	if (!this.on) {
 		return;
 	}
 
 	var a2bx = a.position.x - b.position.x;
 	var a2by = a.position.y - b.position.y;
-	var a2bz = a.position.z - b.position.z;
 
-	var a2bdistanceSquared = Math.max(a2bx * a2bx + a2by * a2by + a2bz * a2bz, this.distanceMinSquared);
+	var a2bdistanceSquared = Math.max(a2bx * a2bx + a2by * a2by, this.distanceMinSquared);
 
 	var force = (this.constant * a.mass * b.mass) / a2bdistanceSquared;
 
 	var length = Math.sqrt(a2bdistanceSquared);
+	if (length > this.distanceMin * 100) {
+		this.on = false;
+	}
 
 	if (force === 0 || length === 0) {
 		a2bx = 0;
 		a2by = 0;
-		a2bz = 0;
 	}
 	else {
 		// make unit vector
 		a2bx /= length;
 		a2by /= length;
-		a2bz /= length;
 
 		// multiply by force
 		a2bx *= force;
 		a2by *= force;
-		a2bz *= force;
 	}
 	
-	// apply
-	if (!a.fixed) {
-		a.force.add(-a2bx, -a2by, -a2bz);
-	}
-	if (!b.fixed) {
-		b.force.add(a2bx, a2by, a2bz);
-	}
+	a.force.add(-a2bx, -a2by);
+	b.force.add(a2bx, a2by);
 };
 
 
@@ -289,16 +256,15 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 		k2Force,
 		k3Force,
 		k4Force,
-		s = this.s;
+		s = this.s,
+		halfDeltaT = 0.5 * deltaT;
 
 	this.allocateParticles();
 
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			this.originalPositions[i].set(p.position);
-			this.originalVelocities[i].set(p.velocity);
-		}
+		this.originalPositions[i].set(p.position);
+		this.originalVelocities[i].set(p.velocity);
 		p.force.clear();	// and clear the forces
 	}
 
@@ -310,10 +276,8 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 	// save the intermediate forces
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			this.k1Forces[i].set(p.force);
-			this.k1Velocities[i].set(p.velocity);
-		}
+		this.k1Forces[i].set(p.force);
+		this.k1Velocities[i].set(p.velocity);
 
 		p.force.clear();
 	}
@@ -321,20 +285,18 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 	////////////////////////////////////////////////////////////////
 	// get k2 values
 
+
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			originalPosition = this.originalPositions[i];
-			k1Velocity = this.k1Velocities[i];
-			p.position.x = originalPosition.x + k1Velocity.x * 0.5 * deltaT;
-			p.position.y = originalPosition.y + k1Velocity.y * 0.5 * deltaT;
-			p.position.z = originalPosition.z + k1Velocity.z * 0.5 * deltaT;
-			originalVelocity = this.originalVelocities[i];
-			k1Force = this.k1Forces[i];
-			p.velocity.x = originalVelocity.x + k1Force.x * 0.5 * deltaT / p.mass;
-			p.velocity.y = originalVelocity.y + k1Force.y * 0.5 * deltaT / p.mass;
-			p.velocity.z = originalVelocity.z + k1Force.z * 0.5 * deltaT / p.mass;
-		}
+		var halfDeltaTperMass = halfDeltaT / p.mass;
+		originalPosition = this.originalPositions[i];
+		k1Velocity = this.k1Velocities[i];
+		p.position.x = originalPosition.x + k1Velocity.x * halfDeltaT;
+		p.position.y = originalPosition.y + k1Velocity.y * halfDeltaT;
+		originalVelocity = this.originalVelocities[i];
+		k1Force = this.k1Forces[i];
+		p.velocity.x = originalVelocity.x + k1Force.x * halfDeltaTperMass;
+		p.velocity.y = originalVelocity.y + k1Force.y * halfDeltaTperMass;
 	}
 
 	s.applyForces();
@@ -342,10 +304,8 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 	// save the intermediate forces
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			this.k2Forces[i].set(p.force);
-			this.k2Velocities[i].set(p.velocity);
-		}
+		this.k2Forces[i].set(p.force);
+		this.k2Velocities[i].set(p.velocity);
 		p.force.clear();	// and clear the forces now that we are done with them
 	}
 
@@ -355,18 +315,14 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			originalPosition = this.originalPositions[i];
-			k2Velocity = this.k2Velocities[i];
-			p.position.x = originalPosition.x + k2Velocity.x * 0.5 * deltaT;
-			p.position.y = originalPosition.y + k2Velocity.y * 0.5 * deltaT;
-			p.position.z = originalPosition.z + k2Velocity.z * 0.5 * deltaT;
-			originalVelocity = this.originalVelocities[i];
-			k2Force = this.k2Forces[i];
-			p.velocity.x = originalVelocity.x + k2Force.x * 0.5 * deltaT / p.mass;
-			p.velocity.y = originalVelocity.y + k2Force.y * 0.5 * deltaT / p.mass;
-			p.velocity.z = originalVelocity.z + k2Force.z * 0.5 * deltaT / p.mass;
-		}
+		originalPosition = this.originalPositions[i];
+		k2Velocity = this.k2Velocities[i];
+		p.position.x = originalPosition.x + k2Velocity.x * halfDeltaT;
+		p.position.y = originalPosition.y + k2Velocity.y * halfDeltaT;
+		originalVelocity = this.originalVelocities[i];
+		k2Force = this.k2Forces[i];
+		p.velocity.x = originalVelocity.x + k2Force.x * halfDeltaTperMass;
+		p.velocity.y = originalVelocity.y + k2Force.y * halfDeltaTperMass;
 	}
 
 	s.applyForces();
@@ -374,10 +330,8 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 	// save the intermediate forces
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			this.k3Forces[i].set(p.force);
-			this.k3Velocities[i].set(p.velocity);
-		}
+		this.k3Forces[i].set(p.force);
+		this.k3Velocities[i].set(p.velocity);
 		p.force.clear();	// and clear the forces now that we are done with them
 	}
 
@@ -386,18 +340,16 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 	// get k4 values
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			originalPosition = this.originalPositions[i];
-			k3Velocity = this.k3Velocities[i];
-			p.position.x = originalPosition.x + k3Velocity.x * deltaT;
-			p.position.y = originalPosition.y + k3Velocity.y * deltaT;
-			p.position.z = originalPosition.z + k3Velocity.z * deltaT;
-			originalVelocity = this.originalVelocities[i];
-			k3Force = this.k3Forces[i];
-			p.velocity.x = originalVelocity.x + k3Force.x * deltaT / p.mass;
-			p.velocity.y = originalVelocity.y + k3Force.y * deltaT / p.mass;
-			p.velocity.z = originalVelocity.z + k3Force.z * deltaT / p.mass;
-		}
+		originalPosition = this.originalPositions[i];
+		k3Velocity = this.k3Velocities[i];
+		p.position.x = originalPosition.x + k3Velocity.x * deltaT;
+		p.position.y = originalPosition.y + k3Velocity.y * deltaT;
+		originalVelocity = this.originalVelocities[i];
+		k3Force = this.k3Forces[i];
+
+		var deltaTperMass = deltaT / p.mass;
+		p.velocity.x = originalVelocity.x + k3Force.x * deltaTperMass;
+		p.velocity.y = originalVelocity.y + k3Force.y * deltaTperMass;
 	}
 
 	s.applyForces();
@@ -405,10 +357,8 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 	// save the intermediate forces
 	for (i = 0; i < s.particles.length; i++) {
 		p = s.particles[i];
-		if (!p.fixed) {
-			this.k4Forces[i].set(p.force);
-			this.k4Velocities[i].set(p.velocity);
-		}
+		this.k4Forces[i].set(p.force);
+		this.k4Velocities[i].set(p.velocity);
 	}
 
 	/////////////////////////////////////////////////////////////
@@ -418,9 +368,6 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 
 		p = s.particles[i];
 		p.age += deltaT;
-		if (p.fixed) {
-			continue;
-		}
 		
 		// update position
 		originalPosition = this.originalPositions[i];
@@ -428,9 +375,9 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 		k2Velocity = this.k2Velocities[i];
 		k3Velocity = this.k3Velocities[i];
 		k4Velocity = this.k4Velocities[i];
-		p.position.x = originalPosition.x + deltaT / 6.0 * (k1Velocity.x + 2.0*k2Velocity.x + 2.0*k3Velocity.x + k4Velocity.x);
-		p.position.y = originalPosition.y + deltaT / 6.0 * (k1Velocity.y + 2.0*k2Velocity.y + 2.0*k3Velocity.y + k4Velocity.y);
-		p.position.z = originalPosition.z + deltaT / 6.0 * (k1Velocity.z + 2.0*k2Velocity.z + 2.0*k3Velocity.z + k4Velocity.z);
+		var oneSixthDeltaT = deltaT / 6.0;
+		p.position.x = originalPosition.x + oneSixthDeltaT * (k1Velocity.x + 2.0*k2Velocity.x + 2.0*k3Velocity.x + k4Velocity.x);
+		p.position.y = originalPosition.y + oneSixthDeltaT * (k1Velocity.y + 2.0*k2Velocity.y + 2.0*k3Velocity.y + k4Velocity.y);
 
 		// update velocity
 		originalVelocity = this.originalVelocities[i];
@@ -438,9 +385,9 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 		k2Force = this.k2Forces[i];
 		k3Force = this.k3Forces[i];
 		k4Force = this.k4Forces[i];
-		p.velocity.x = originalVelocity.x + deltaT / (6.0 * p.mass) * (k1Force.x + 2.0*k2Force.x + 2.0*k3Force.x + k4Force.x);
-		p.velocity.y = originalVelocity.y + deltaT / (6.0 * p.mass) * (k1Force.y + 2.0*k2Force.y + 2.0*k3Force.y + k4Force.y);
-		p.velocity.z = originalVelocity.z + deltaT / (6.0 * p.mass) * (k1Force.z + 2.0*k2Force.z + 2.0*k3Force.z + k4Force.z);
+		var deltaTperSixMass = deltaT / (6.0 * p.mass);
+		p.velocity.x = originalVelocity.x + deltaTperSixMass * (k1Force.x + 2.0*k2Force.x + 2.0*k3Force.x + k4Force.x);
+		p.velocity.y = originalVelocity.y + deltaTperSixMass * (k1Force.y + 2.0*k2Force.y + 2.0*k3Force.y + k4Force.y);
 	}
 };
 
@@ -448,7 +395,7 @@ RungeKuttaIntegrator.prototype.step = function (deltaT) {
 /**
  * Applies physics rules to a collection of particles
  */
-function ParticleSystem() {
+function ParticleSystem(drag) {
 
 	this.particles = [];
 	this.springs = [];
@@ -456,19 +403,14 @@ function ParticleSystem() {
 	this.forces = [];
 	this.integrator = new RungeKuttaIntegrator(this);
 	this.hasDeadParticles = false;
+	this.timer = new Timer();
+	this.applyForcesTimings = new MeanBuffer(1000);
 
 	var argc = arguments.length;
-	if (argc === 2) {
-		this.gravity = new Vector(0, arguments[0], 0);
-		this.drag = arguments[1];
-	}
-	else if (argc === 4) {
-		this.gravity = new Vector(arguments[0], arguments[1], arguments[2]);
-		this.drag = arguments[3];
-	}
-	else {
-		this.gravity = new Vector(0, ParticleSystem.DEFAULT_GRAVITY, 0);
+	if (drag == null) {
 		this.drag = ParticleSystem.DEFAULT_DRAG;
+	} else {
+		this.drag = drag;
 	}
 }
 ParticleSystem.DEFAULT_GRAVITY = 0;
@@ -494,15 +436,6 @@ ParticleSystem.prototype.setIntegrator = function(integrator) {
 	}
 }
  */
-ParticleSystem.prototype.setGravity = function () {
-	var argc = arguments.length;
-	if (argc === 1) {
-		this.gravity.set(0, arguments[0], 0);
-	}
-	else if (argc === 3) {
-		this.gravity.set(arguments[0], arguments[1], arguments[2]);
-	}
-};
 ParticleSystem.prototype.tick = function() {
 	this.tick_count += 1;
 	this.integrator.step(arguments.length === 0 ? 1 : arguments[0]);
@@ -511,17 +444,15 @@ ParticleSystem.prototype.makeParticle = function() {
 	var mass = 1.0;
 	var x = 0;
 	var y = 0;
-	var z = 0;
-	if (arguments.length === 4) {
+	if (arguments.length === 3) {
 		mass = arguments[0];
 		x = arguments[1];
 		y = arguments[2];
-		z = arguments[3];
 	} else if (arguments.length === 1) {
         mass = arguments[0];
     }
 	var p = new Particle(mass);
-	p.position.set(x, y, z);
+	p.position.set(x, y);
 	this.particles.push(p);
 	return p;
 };
@@ -540,20 +471,19 @@ ParticleSystem.prototype.clear = function() {
 	this.springs.clear();
 	this.attractions.clear();
 };
+ParticleSystem.prototype.pruneForces = function() {
+	var original_attractions = this.attractions;
+	this.attractions = original_attractions.filter(function(a){return a.on;});
+};
 ParticleSystem.prototype.applyForces = function() {
+	this.timer.start();
+	this.pruneForces();
 
 	var t, i;
 
-	if (!this.gravity.isZero()) {
-		for (i = 0; i < this.particles.length; i++) {
-			t = this.particles[i];
-			t.force.add(this.gravity);
-		}
-	}
-
 	for (i = 0; i < this.particles.length; i++) {
 		t = this.particles[i];
-		t.force.add(t.velocity.x * -1 * this.drag, t.velocity.y * -1 * this.drag, t.velocity.z * -1 * this.drag);
+		t.force.add(t.velocity.x * -1 * this.drag, t.velocity.y * -1 * this.drag);
 	}
 
 	for (i = 0; i < this.springs.length; i++) {
@@ -571,6 +501,7 @@ ParticleSystem.prototype.applyForces = function() {
 		t.apply();
 	}
 
+	this.applyForcesTimings.put(this.timer.stop());
 };
 ParticleSystem.prototype.clearForces = function() {
 	var i;
@@ -636,44 +567,33 @@ Smoother.prototype.getValue = function () {
 };
 
 
-function Smoother3D (smoothness) {
+function Smoother2D (smoothness) {
     this.x0 = new Smoother(smoothness);
     this.y0 = new Smoother(smoothness);
-    this.z0 = new Smoother(smoothness);
 };
 
-Smoother3D.prototype.setSmoothness = function (smoothness) {
+Smoother2D.prototype.setSmoothness = function (smoothness) {
     this.x0.setSmoothness(smoothness);
     this.y0.setSmoothness(smoothness);
-    this.z0.setSmoothness(smoothness);
 };
 
-Smoother3D.prototype.setX = function (x) {
+Smoother2D.prototype.setX = function (x) {
     this.x0.setValue(x);
 };
 
-Smoother3D.prototype.setY = function (y) {
+Smoother2D.prototype.setY = function (y) {
     this.y0.setValue(y);
 };
 
-Smoother3D.prototype.setZ = function (z) {
-    this.z0.setValue(z);
-};
-
-Smoother3D.prototype.x = function () {
+Smoother2D.prototype.x = function () {
     return this.x0.getValue();
 };
 
-Smoother3D.prototype.y = function () {
+Smoother2D.prototype.y = function () {
     return this.y0.getValue();
 };
 
-Smoother3D.prototype.z = function () {
-    return this.z0.getValue();
-};
-
-Smoother3D.prototype.tick = function () {
+Smoother2D.prototype.tick = function () {
     this.x0.tick();
     this.y0.tick();
-    this.z0.tick();
 };

@@ -73,6 +73,7 @@ $(document).ready(function(){
         var crawler = new Crawler({delay: 100});
         var graph = new ParticleGraph(seed, {node_size: 5,
                                              frames_per_second: 24,
+                                             updates_per_second: 12,
                                              target: canvas,
                                              width: canvas.width,
                                              height: canvas.height});

@@ -45,14 +45,15 @@ function bounded (x, min, max) {
 	}
 }
 
-function Centroid3D (smoothness, width, height) {
-    Centroid3D.superclass.constructor.call(this, smoothness);
+function Centroid2D (smoothness, width, height) {
+    Centroid2D.superclass.constructor.call(this, smoothness);
     this.width = width;
     this.height = height;
+    this.extents = { x_min: 0, x_max: width, y_min: 0, y_min: height };
 }
-extend(Centroid3D, Smoother3D);
-Centroid3D.prototype.recalc = function (particles) {
-    var extents = particles.reduce(function(state, curr, idx, arr) {
+extend(Centroid2D, Smoother2D);
+Centroid2D.prototype.recalc = function (particles) {
+    this.extents = particles.reduce(function(state, curr, idx, arr) {
             return { x_min: Math.min(state.x_min, curr.position.x),
                      y_min: Math.min(state.y_min, curr.position.y),
                      x_max: Math.max(state.x_max, curr.position.x),
@@ -61,11 +62,16 @@ Centroid3D.prototype.recalc = function (particles) {
          { x_min: 999999, y_min: 999999,
            x_max: -999999, y_max: -999999 });
 
-    var dx = extents.x_max - extents.x_min,
-        dy = extents.y_max - extents.y_min;
-    this.x0.setTarget(extents.x_min + 0.5 * dx);
-    this.y0.setTarget(extents.y_min + 0.5 * dy);
-    this.z0.setValue(Math.min(1, this.width / (dx * 1.15), this.height / (dy * 1.15)));
+    var dx = this.extents.x_max - this.extents.x_min,
+        dy = this.extents.y_max - this.extents.y_min;
+    this.x0.setTarget(this.extents.x_min + 0.5 * dx);
+    this.y0.setTarget(this.extents.y_min + 0.5 * dy);
+};
+
+Centroid2D.prototype.scale = function () {
+    var dx = this.extents.x_max - this.extents.x_min,
+        dy = this.extents.y_max - this.extents.y_min;
+    return Math.min(1, this.width / (dx * 1.15), this.height / (dy * 1.15));
 };
 
 function ParticleGraphNode (type, value, parent_node, particle) {
@@ -74,6 +80,7 @@ function ParticleGraphNode (type, value, parent_node, particle) {
     this.parent_node = parent_node;
     this.children = [];
     this.particle = particle;
+	this.child_direction = Math.random() * 360;
     if (parent_node != null) {
         this.depth = parent_node.depth + 1;
         parent_node.children.push(this);
@@ -100,6 +107,7 @@ function ParticleGraph (root, options) {
         width: 1000,
         height: 700,
 		frames_per_second: 24,
+		updates_per_second: 4,
 		zoom_min: 0.10,
 		zoom_max: 1.5,
         mass: 100,
@@ -118,23 +126,23 @@ function ParticleGraph (root, options) {
     var that = this;
 	var running = true;
 	var frame_rate_buffer = new MeanBuffer(opts.frames_per_second * 5);
-    var physics = new ParticleSystem(0.0, 0.6);
-    var centroid = new Centroid3D(1.8, opts.width, opts.height);
+    var physics = new ParticleSystem(0.6);
+	    physics.tick = new RateLimitedCall(Math.round(1000 / (opts.updates_per_second - 1)), 
+				                           physics.tick, physics);
+    var centroid = new Centroid2D(1.8, opts.width, opts.height);
     var x_positioning_ratio = opts.width / opts.height;
     var y_positioning_ratio = opts.height / opts.width;
-    // nodes and particles are parallel arrays where the particle at a given
-    // offset corresponds to the node value at that same offset on the nodes array
     var root_node = null;
     var particles = [];
     var edges = [];
     var selected_node = null;
 
-    var drag_adjust = new Vector(0, 0, 0);
+    var drag_adjust = new Vector(0, 0);
     var zoom_level = null;
 
     var z_scale = function () {
         if (zoom_level == null) {
-            return centroid.z();
+            return centroid.scale();
         } else {
             return zoom_level;
         }
@@ -168,13 +176,13 @@ function ParticleGraph (root, options) {
     this.offset_for_position = function (x, y) {
         var x1 = ((x - centroid.x()) * z_scale()) + drag_adjust.x + (opts.width / 2);
         var y1 = ((y - centroid.y()) * z_scale()) + drag_adjust.y + (opts.height / 2);
-        return new Vector(x1, y1, 0);
+        return new Vector(x1, y1);
     };
 
     this.position_for_offset = function (x, y) {
         var x1 = (x + centroid.x() - drag_adjust.x - (opts.width / 2)) * (1/z_scale());
         var y1 = (y + centroid.y() - drag_adjust.y - (opts.height / 2)) * (1/z_scale());
-        return new Vector(x1, y1, 0);
+        return new Vector(x1, y1);
     };
 
     this.node_at = function (x, y) {
@@ -201,7 +209,7 @@ function ParticleGraph (root, options) {
     };
 
     var add_root_node = function (name_value) {
-        var particle = physics.makeParticle(4, centroid.x(), centroid.y(), 0);
+        var particle = physics.makeParticle(4, centroid.x(), centroid.y());
         particles.push(particle);
         root_node = new ParticleGraphNode('name', name_value, null, particle);
         selected_node = root_node;
@@ -209,28 +217,33 @@ function ParticleGraph (root, options) {
     };
 
     var add_name_node = function (name_value, duns_node) {
-        var xrnd = Math.random(),
-            yrnd = Math.random(),
-            nearx = duns_node.parent_node.particle.position.x,
-            neary = duns_node.parent_node.particle.position.y,
-            cdx = nearx - centroid.x(),
-            cdy = neary - centroid.y();
-        cdx = (cdx == 0) ? xrnd * 2 - 1 : cdx;
-        cdy = (cdy == 0) ? yrnd * 2 - 1 : cdy;
-        xrnd = xrnd * 4 - 2;
-        yrnd = yrnd * 4 - 2;
-        var xdir = cdy / Math.abs(cdy) * x_positioning_ratio * (xrnd / Math.abs(xrnd)) + xrnd;
-            ydir = cdx / Math.abs(cdx) * y_positioning_ratio * (yrnd / Math.abs(yrnd)) + yrnd;
+		var grandparent_node = duns_node.parent_node;
+        var grandchilden_of_grandparent = grandparent_node.children.reduce(
+                                            function(acc, chld){return acc + chld.children.length;},
+                                            0);
+                
+		var near = new Vector(grandparent_node.particle.position.x,
+							  grandparent_node.particle.position.y);
+        var inverter = (grandchilden_of_grandparent % 2 == 0) ? 1 : -1;
+        var direction = new Vector(grandparent_node.particle.position.x - root_node.particle.position.x,
+                                   grandparent_node.particle.position.y - root_node.particle.position.y);
+        var direction = new Vector(grandparent_node.particle.velocity.x,
+                                   grandparent_node.particle.velocity.y);
+        if (direction.isZero()) {
+            direction = new Vector(Math.random(), Math.random());
+        } else {
+            direction.unit();
+        }
+        direction.rotate((grandchilden_of_grandparent * 7) * (Math.PI / 180));
+		near.add(direction.x, direction.y);
 
         var scale = Math.sqrt(Math.max(1, particles.length)),
-            p = physics.makeParticle(1 + 2/duns_node.depth,
-                                     nearx + xdir,
-                                     neary + ydir,
-                                     0);
+            p = physics.makeParticle(2 + 1/duns_node.depth,
+                                     near.x,
+                                     near.y);
 
         var node = new ParticleGraphNode('name', name_value, duns_node, p);
-        var grandparent_node = node.parent_node.parent_node;
-        add_edge(node.particle, grandparent_node.particle, 
+        add_edge(node.particle, grandparent_node.particle, node.depth,
 				 sorensen_index(node.value, grandparent_node.value));
         particles.push(p);
         return node;
@@ -249,15 +262,16 @@ function ParticleGraph (root, options) {
         }
     }
 
-    var add_edge = function (a_prtcl, b_prtcl, dampening) {
+    var add_edge = function (a_prtcl, b_prtcl, multiplier, dampening) {
 		dampening = Math.min(0.9, dampening);
         physics.makeSpring(a_prtcl, b_prtcl,
-                           opts.edge_strength * 1.5, opts.edge_strength * 0.5,
+                           opts.edge_strength * multiplier, opts.edge_strength * multiplier,
                            opts.node_size * 30 * (1 - dampening));
+        root_node.particle.mass = Math.max(4 / Math.sqrt(particles.length), 1);
         for (var idx = 0; idx < particles.length; idx++) {
             physics.makeAttraction(a_prtcl, particles[idx], 
-                                   -opts.spacer_strength * (1 - dampening),
-                                   opts.node_size * 2);
+                                   -opts.spacer_strength * Math.min(multiplier, 3) * (1 - dampening),
+                                   opts.node_size * 4);
         }
         edges.push([a_prtcl, b_prtcl]);
     };
@@ -266,7 +280,6 @@ function ParticleGraph (root, options) {
         add_root_node(root);
         centroid.x0.setValue(0.0);
         centroid.y0.setValue(0.0);
-        centroid.z0.setValue(1.0);
     };
 
     var selected_particles = function () {
@@ -317,9 +330,10 @@ function ParticleGraph (root, options) {
 					}
 				}
 
-				physics.tick();
-				if (particles.length > 1)
+				physics.tick(1);
+				if (particles.length > 1) {
 					centroid.recalc(particles);
+				}
 			}
             processing.translate(opts.width / 2, opts.height / 2);
             processing.translate(drag_adjust.x, drag_adjust.y);
@@ -337,6 +351,7 @@ function ParticleGraph (root, options) {
                     continue;
                 var a_prtcl = edges[idx][0],
                     b_prtcl = edges[idx][1];
+                processing.strokeWeight(1.25/z_scale());
                 processing.stroke(0xe0, 0xe0, 0xe0, 0xff);
                 processing.line(a_prtcl.position.x, a_prtcl.position.y,
                                 b_prtcl.position.x, b_prtcl.position.y);
@@ -407,6 +422,17 @@ function ParticleGraph (root, options) {
 
 			draw_zoom_control(processing);
 			processing.text('Frame rate:' + Math.round(frame_rate_buffer.mean()), 5, opts.height - 20);
+			processing.text('applyForces: ' + physics.applyForcesTimings.mean(), 5, opts.height - 60);
+			var active_attractions = 0,
+				inactive_attractions = 0;
+			for (var idx = 0; idx < physics.attractions.length; idx++) {
+				if (physics.attractions[idx].on == true) {
+					active_attractions += 1;
+				} else {
+					inactive_attractions += 1;
+				}
+			}
+			processing.text('Attractions: ' + active_attractions + ' (active), ' + inactive_attractions + ' (inactive)', 5, opts.height - 40);
         };
         processing.setup = function(){
             processing.frameRate(opts.frames_per_second);
@@ -416,7 +442,7 @@ function ParticleGraph (root, options) {
                 var mouse_position1 = that.position_for_offset(processing.mouseX, processing.mouseY);
 
                 if (zoom_level == null) {
-                    zoom_level = centroid.z();
+                    zoom_level = centroid.scale();
                 } else {
                     zoom_level += bounded(zoom_level * 0.1, 0.025, 0.08) * delta;
 					zoom_level = bounded(zoom_level,
@@ -427,8 +453,7 @@ function ParticleGraph (root, options) {
 				var offset_after_zoom = that.offset_for_position(mouse_position1.x, 
 					                                             mouse_position1.y);
 				var diff = new Vector((offset_after_zoom.x - processing.mouseX),
-					                  (offset_after_zoom.y - processing.mouseY),
-									  0);
+					                  (offset_after_zoom.y - processing.mouseY));
 				drag_adjust.subtract(diff);
                 evt.preventDefault();
             });
@@ -457,9 +482,8 @@ function ParticleGraph (root, options) {
             drag_y = null;
         };
         processing.mouseDragged = function(){
-            drag_adjust.add(new Vector(processing.mouseX - drag_x,
-                                       processing.mouseY - drag_y,
-                                       0));
+            drag_adjust.add(processing.mouseX - drag_x,
+                            processing.mouseY - drag_y);
             drag_x = processing.mouseX;
             drag_y = processing.mouseY;
         };
