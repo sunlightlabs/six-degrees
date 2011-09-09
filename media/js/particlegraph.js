@@ -314,23 +314,25 @@ function ParticleGraph (root, options) {
 
 	this.pause = function () {
 		running = false;
+		$(that).trigger('paused', []);
 	};
 
 	this.resume = function () {
 		running = true;
+		$(that).trigger('resumed', []);
 	};
 
     this.sketch_proc = function (processing) {
         processing.draw = function(){
+			frame_rate_buffer.put(processing.__frameRate);
 			if (running == true) {
-				frame_rate_buffer.put(processing.__frameRate);
 				if (processing.frameCount > opts.frames_per_second * 5) {
-					if (Math.round(frame_rate_buffer.mean()) < opts.frames_per_second / 3) {
+					if (frame_rate_buffer.mean() < opts.frames_per_second / 3) {
 						$(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
 					}
 				}
 
-				physics.tick(1);
+				physics.tick(2);
 				if (particles.length > 1) {
 					centroid.recalc(particles);
 				}
@@ -421,7 +423,8 @@ function ParticleGraph (root, options) {
             }
 
 			draw_zoom_control(processing);
-			processing.text('Frame rate:' + Math.round(frame_rate_buffer.mean()), 5, opts.height - 20);
+			processing.text('Running? ' + ((running == true) ? 'Yes' : 'No'), 5, opts.height - 80);
+			processing.text('Frame rate:' + frame_rate_buffer.mean() + ' (Setting: ' + opts.frames_per_second + ')', 5, opts.height - 20);
 			processing.text('applyForces: ' + physics.applyForcesTimings.mean(), 5, opts.height - 60);
 			var active_attractions = 0,
 				inactive_attractions = 0;
@@ -438,6 +441,12 @@ function ParticleGraph (root, options) {
             processing.frameRate(opts.frames_per_second);
             processing.colorMode(processing.RGB);
             processing.size(opts.width, opts.height);
+			$(that).bind('paused', function(){
+					processing.frameRate(opts.frames_per_second / 3);
+			});
+			$(that).bind('resumed', function(){
+					processing.frameRate(opts.frames_per_second);
+			});
             $(opts.target).mousewheel(function (evt, delta) {
                 var mouse_position1 = that.position_for_offset(processing.mouseX, processing.mouseY);
 
