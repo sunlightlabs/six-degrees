@@ -423,7 +423,7 @@ function ParticleGraph (root, options) {
             }
 
 			draw_zoom_control(processing);
-			processing.text('Running? ' + ((running == true) ? 'Yes' : 'No'), 5, opts.height - 80);
+			processing.text('Particles: ' + particles.length, 5, opts.height - 80);
 			processing.text('Frame rate:' + frame_rate_buffer.mean() + ' (Setting: ' + opts.frames_per_second + ')', 5, opts.height - 20);
 			processing.text('applyForces: ' + physics.applyForcesTimings.mean(), 5, opts.height - 60);
 			var active_attractions = 0,
