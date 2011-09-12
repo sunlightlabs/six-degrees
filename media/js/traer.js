@@ -213,6 +213,54 @@ Attraction.prototype.apply = function() {
 };
 
 
+function EulerIntegrator (s) {
+	this.s = s;
+}
+EulerIntegrator.prototype.step = function (t) {
+	this.s.clearForces();
+	this.s.applyForces();
+
+	for (var idx = 0; idx < this.s.particles.length; idx++) {
+		var p = this.s.particles[idx];
+		p.force.scale(t / p.mass);
+		p.velocity.add(p.force.x, p.force.y);
+		p.velocity.scale(t);
+		p.position.add(p.velocity.x, p.velocity.y);
+	}
+};
+
+
+function ModifiedEulerIntegrator (s) {
+	this.s = s;
+};
+ModifiedEulerIntegrator.prototype.step = function (t) {
+	t = 0.7;
+	this.s.clearForces();
+	this.s.applyForces();
+
+	var half_t = t / 2,
+		a = new Vector(0, 0),
+		holder = new Vector(0, 0);
+
+	for (var idx = 0; idx < this.s.particles.length; idx++) {
+		var p = this.s.particles[idx];
+
+		p.force.scale(1 / p.mass);
+		a = new Vector(p.force.x, p.force.y);
+
+		p.velocity.scale(t);
+		p.position.add(p.velocity.x, p.velocity.y);
+		holder = new Vector(p.velocity.x, p.velocity.y);
+
+		a.scale(t);
+		p.velocity.add(a.x, a.y);
+
+		a.scale(half_t);
+		p.position.add(a.x, a.y);
+	}
+};
+
+
 /**
  * Fourth-order integration approximator
  */
@@ -506,7 +554,7 @@ ParticleSystem.prototype.applyForces = function() {
 ParticleSystem.prototype.clearForces = function() {
 	var i;
 	for (i = 0; i < this.particles.length; i++) {
-		this.particles[i].clear();
+		this.particles[i].force.set(0, 0, 0);
 	}
 };
 
