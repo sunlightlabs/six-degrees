@@ -74,6 +74,8 @@ $(document).ready(function(){
         var graph = new ParticleGraph(seed, {node_size: 5,
                                              frames_per_second: 24,
                                              updates_per_second: 12,
+                                             spacer_strength: 1200,
+                                             edge_strength: 0.007,
                                              target: canvas,
                                              width: canvas.width,
                                              height: canvas.height});
@@ -96,7 +98,7 @@ $(document).ready(function(){
         $(crawler).bind('done', function(){ ui_ready(); setTimeout(graph.pause, 15 * 1000); });
         $("#cancel-search-btn").click(function(){
             crawler.stop();
-			$("#search-queue-length").text("");
+            $("#search-queue-length").text("");
         });
         $(crawler).bind('noderesult', function (event, node_value, result_type) {
         });
@@ -108,8 +110,8 @@ $(document).ready(function(){
                       value: link_value[1].toUpperCase() };
             graph.add_link(a, b);
 
-			var search_queue_length = crawler.name_queue_length() + crawler.duns_queue_length();
-			$("#search-queue-length").text("Items left to search for: " + search_queue_length);
+            var search_queue_length = crawler.name_queue_length() + crawler.duns_queue_length();
+            $("#search-queue-length").text("Items left to search for: " + search_queue_length);
        });
 
         crawler.start(seed, 'name');
