@@ -1,26 +1,3 @@
-function delay (ms, f, args) {
-    setTimeout(function(){ f.apply(undefined, args); }, ms);
-}
-
-function ReplaceableCall (delay, proc) {
-    var that = this;
-    that.timeout = null;
-
-    var do_proc = function () {
-        that.timeout = null;
-        proc();
-    };
-
-    var guarded_proc = function () {
-        if (that.timeout != null) {
-            clearTimeout(that.timeout);
-        }
-        that.timeout = setTimeout(do_proc, delay);
-    };
-
-    return guarded_proc;
-}
-
 function retrieve_node_details (selected_node) {
     $("#node-details *").remove();
 
@@ -70,7 +47,7 @@ $(document).ready(function(){
         var canvas = document.getElementById("graph");
         $(canvas).attr("width", 1000);
         $(canvas).attr("height", 700);
-        var crawler = new Crawler({delay: 100});
+        var crawler = new Crawler({delay: 250});
         var graph = new ParticleGraph(seed, {node_size: 5,
                                              frames_per_second: 24,
                                              updates_per_second: 12,
@@ -80,6 +57,9 @@ $(document).ready(function(){
                                              width: canvas.width,
                                              height: canvas.height});
         var p = new Processing(canvas, graph.sketch_proc);
+		$(graph).bind('paused', function (event) {
+			ui_ready();
+		});
         $(graph).bind('lowframerate', function (event, frame_rate) {
             setTimeout(graph.pause, 15 * 1000);
             crawler.stop();
@@ -95,7 +75,9 @@ $(document).ready(function(){
             $("#cancel-search-btn").hide();
             $("#low-frame-rate-warning").hide();
         };
-        $(crawler).bind('done', function(){ ui_ready(); setTimeout(graph.pause, 15 * 1000); });
+        $(crawler).bind('done', function(){
+			setTimeout(graph.pause, 15 * 1000);
+		});
         $("#cancel-search-btn").click(function(){
             crawler.stop();
             $("#search-queue-length").text("");
@@ -108,7 +90,7 @@ $(document).ready(function(){
                       value: link_value[0].toUpperCase() },
                 b = { type: result_type,
                       value: link_value[1].toUpperCase() };
-            graph.add_link(a, b);
+			graph.add_link(a, b);
 
             var search_queue_length = crawler.name_queue_length() + crawler.duns_queue_length();
             $("#search-queue-length").text("Items left to search for: " + search_queue_length);

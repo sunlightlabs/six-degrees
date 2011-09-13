@@ -207,6 +207,7 @@ function ParticleGraph (root, options) {
             b_node = add_node(b.type, b.value, a_node);
         }
     };
+	this.add_link = QueuedRateLimitedCall(41, this.add_link);
 
     var add_root_node = function (name_value) {
         var particle = physics.makeParticle(4, centroid.x(), centroid.y());
@@ -234,7 +235,8 @@ function ParticleGraph (root, options) {
         } else {
             direction.unit();
         }
-        direction.rotate((grandchilden_of_grandparent * 7) * (Math.PI / 180));
+        direction.rotate((grandchilden_of_grandparent * 173 - 173) * (Math.PI / 180));
+		direction.scale(opts.node_size);
 		near.add(direction.x, direction.y);
 
         var scale = Math.sqrt(Math.max(1, particles.length)),
@@ -313,8 +315,17 @@ function ParticleGraph (root, options) {
     };
 
 	this.pause = function () {
-		running = false;
-		$(that).trigger('paused', []);
+		var _pause = function () {
+			running = false;
+			$(that).trigger('paused', []);
+		};
+		if (that.add_link.queue.is_empty()) {
+			setTimeout(_pause, 15 * 1000);
+		} else {
+			$(that.add_link.queue).bind('emptied', function(evt){
+				setTimeout(_pause, 15 * 1000);
+			});
+		}
 	};
 
 	this.resume = function () {
@@ -332,7 +343,7 @@ function ParticleGraph (root, options) {
 					}
 				}
 
-				physics.tick(2);
+				physics.tick(1);
 				if (particles.length > 1) {
 					centroid.recalc(particles);
 				}
@@ -426,16 +437,7 @@ function ParticleGraph (root, options) {
 			processing.text('Particles: ' + particles.length, 5, opts.height - 80);
 			processing.text('Frame rate:' + frame_rate_buffer.mean() + ' (Setting: ' + opts.frames_per_second + ')', 5, opts.height - 20);
 			processing.text('applyForces: ' + physics.applyForcesTimings.mean(), 5, opts.height - 60);
-			var active_attractions = 0,
-				inactive_attractions = 0;
-			for (var idx = 0; idx < physics.attractions.length; idx++) {
-				if (physics.attractions[idx].on == true) {
-					active_attractions += 1;
-				} else {
-					inactive_attractions += 1;
-				}
-			}
-			processing.text('Attractions: ' + active_attractions + ' (active), ' + inactive_attractions + ' (inactive)', 5, opts.height - 40);
+			processing.text('add_link queue: ' + that.add_link.queue.backlog_size(), 5, opts.height - 40);
         };
         processing.setup = function(){
             processing.frameRate(opts.frames_per_second);
