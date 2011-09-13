@@ -122,16 +122,12 @@ function Spring(a, b, k, d, l) {
 	this.length = l;
 	this.a = a;
 	this.b = b;
-	this.on = true;
 }
 Spring.prototype.currentLength = function() { return this.a.position.distanceTo(this.b.position); };
 Spring.prototype.apply = function() {
 
 	var a = this.a;
 	var b = this.b;
-	if (!this.on) {
-		return;
-	}
 
 	var a2bx = a.position.x - b.position.x;
 	var a2by = a.position.y - b.position.y;
@@ -170,7 +166,6 @@ function Attraction(a, b, k, d) {
 	this.a = a;
 	this.b = b;
 	this.constant = k;
-	this.on = true;
 	this.distanceMin = d;
 	this.distanceMinSquared = d * d;
 }
@@ -178,9 +173,6 @@ Attraction.prototype.apply = function() {
 
 	// Skip if force is off or if both particles are fixed
 	var a = this.a, b = this.b;
-	if (!this.on) {
-		return;
-	}
 
 	var a2bx = a.position.x - b.position.x;
 	var a2by = a.position.y - b.position.y;
@@ -190,9 +182,6 @@ Attraction.prototype.apply = function() {
 	var force = (this.constant * a.mass * b.mass) / a2bdistanceSquared;
 
 	var length = Math.sqrt(a2bdistanceSquared);
-	if (length > this.distanceMin * 100) {
-		this.on = false;
-	}
 
 	if (force === 0 || length === 0) {
 		a2bx = 0;
@@ -449,7 +438,7 @@ function ParticleSystem(drag) {
 	this.springs = [];
 	this.attractions = [];
 	this.forces = [];
-	this.integrator = new RungeKuttaIntegrator(this);
+    this.integrator = new RungeKuttaIntegrator(this);
 	this.hasDeadParticles = false;
 	this.timer = new Timer();
 	this.applyForcesTimings = new MeanBuffer(1000);
@@ -519,13 +508,8 @@ ParticleSystem.prototype.clear = function() {
 	this.springs.clear();
 	this.attractions.clear();
 };
-ParticleSystem.prototype.pruneForces = function() {
-	var original_attractions = this.attractions;
-	this.attractions = original_attractions.filter(function(a){return a.on;});
-};
 ParticleSystem.prototype.applyForces = function() {
 	this.timer.start();
-	this.pruneForces();
 
 	var t, i;
 
