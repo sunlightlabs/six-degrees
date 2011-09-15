@@ -58,9 +58,11 @@ div.node-name {
 }
 
 canvas#graph {
+    background: transparent;
     margin: 0;
     width: 800px;
     height: 600px;
+    outline: none;
 }
 
 div#results {
@@ -130,7 +132,7 @@ div#no-results-text {
 	width: 40%;
 }
 
-div#node-details-container {
+div#node-details-container ,
     font-size: 9pt;
 }
 

@@ -114,7 +114,7 @@ function ParticleGraph (root, options) {
         edge_strength: 0.007,
         spacer_strength: 1200,
         node_size: 5,
-        background: {r: 99, g: 99, b: 99},
+        background: {r: 99, g: 99, b: 99, a: 255},
 		zoom_ctl_x: 5,
 		zoom_ctl_y: 5,
 		zoom_ctl_width: 165,
@@ -137,6 +137,7 @@ function ParticleGraph (root, options) {
     var particles = [];
     var edges = [];
     var selected_node = null;
+    var background_image = null;
 
     var drag_adjust = new Vector(0, 0);
     var zoom_level = null;
@@ -354,7 +355,11 @@ function ParticleGraph (root, options) {
             processing.scale(z_scale());
             processing.translate(-centroid.x(), -centroid.y());
 
-            processing.background(opts.background.r, opts.background.g, opts.background.b);
+            if (background_image == null) {
+                processing.background(opts.background.r, opts.background.g, opts.background.b, opts.background.a);
+            } else {
+                processing.image(background_image, -opts.width / 2, -opts.height / 2);
+            }
 
             var particle_selection = selected_particles();
             var edge_selection = selected_edges(particle_selection);
@@ -443,6 +448,9 @@ function ParticleGraph (root, options) {
             }
         };
         processing.setup = function(){
+            if (opts.background_image != null) {
+                background_image = processing.loadImage(opts.background_image);
+            }
             processing.frameRate(opts.frames_per_second);
             processing.colorMode(processing.RGB);
             processing.size(opts.width, opts.height);

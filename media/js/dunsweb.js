@@ -66,6 +66,7 @@ $(document).ready(function(){
                                              spacer_strength: 1200,
                                              edge_strength: 0.007,
                                              target: canvas,
+                                             background: {r:0, g:0, b:0, a:0},
                                              width: $(canvas).width(),
                                              height: $(canvas).height(),
                                              debug: ! (query_params['debug'] == null)});
