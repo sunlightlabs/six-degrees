@@ -2,7 +2,7 @@
 
 
 from duns.models import FPDS
-from duns.importer import Importer
+from duns.importer import Importer, strip_plus4
 
 
 class FPDSImporter(Importer):
@@ -10,14 +10,16 @@ class FPDSImporter(Importer):
         Importer.__init__(self, 'contracts_contract', 
                           ('unique_transaction_id', 'id',
                            'dunsnumber', 'parentdunsnumber',
-                           'vendorname', 'fiscal_year'),
+                           'vendorlegalorganizationname', 'piid',
+                           'productorservicecode', 'psc_cat', 
+                           'fiscal_year'),
                           FPDS, dbconn)
 
     def record(self, dbrow):
         """Transforms each raw table row into data model objects."""
-        raw_vndr_name = dbrow['vendorname'].strip()
-        raw_duns = dbrow['dunsnumber'].strip()
-        raw_parent_duns = dbrow['parentdunsnumber'].strip()
+        raw_vndr_name = strip_plus4(dbrow['vendorlegalorganizationname'].strip())
+        raw_duns = dbrow['dunsnumber'][:9].strip()
+        raw_parent_duns = dbrow['parentdunsnumber'][:9].strip()
 
         if len(raw_vndr_name) > 0 and (len(raw_duns) > 0 or len(raw_parent_duns) > 0):
             vndr_name = self._name(raw_vndr_name)
@@ -30,5 +32,8 @@ class FPDSImporter(Importer):
             fpds.duns_parent = parent_duns
             fpds.company_name = vndr_name
             fpds.fiscal_year = dbrow['fiscal_year']
+            fpds.piid = dbrow['piid']
+            fpds.psc = dbrow['productorservicecode']
+            fpds.psc_category = dbrow['psc_cat']
             fpds.save()
 

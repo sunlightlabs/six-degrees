@@ -29,8 +29,16 @@ class FAADS(models.Model):
                                              max_length="32", 
                                              blank=False, null=False)
     duns = models.ForeignKey(DUNS, related_name='faads', blank=False, null=False)
+    duns_conf_code = models.CharField(max_length=2, blank=True, null=True)
     recipient_name = models.ForeignKey(Name, related_name='faads', blank=False, null=False)
     fiscal_year = models.IntegerField("Fiscal year", blank=False, null=False)
+    cfda_program_number = models.CharField(max_length=8, blank=True, null=True)
+    cfda_program_title = models.CharField(max_length=75, blank=True, null=True)
+    obligation_action_date = models.DateField(blank=True, null=True)
+    federal_award_id = models.CharField(max_length=16, blank=True, null=True)
+    federal_award_mod = models.CharField(max_length=4, blank=True, null=True)
+
+
 
 
 
@@ -44,4 +52,7 @@ class FPDS(models.Model):
     duns_parent = models.ForeignKey(DUNS, related_name='fpds_parent', blank=False, null=True)
     company_name = models.ForeignKey(Name, related_name='fpds', blank=False, null=False)
     fiscal_year = models.IntegerField("Fiscal year", blank=False, null=False)
+    piid = models.CharField(max_length=50, blank=True, null=True)
+    psc = models.CharField(max_length=4, blank=True, null=True)
+    psc_category = models.CharField(max_length=2, blank=True, null=True)
 

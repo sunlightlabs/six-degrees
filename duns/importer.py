@@ -1,11 +1,21 @@
 """Base class for implementing Data Commons importers."""
 
 
+import re
 from contextlib import closing
 from django.db.models import Max
 from duns.models import DUNS, Name
 from psycopg2.extras import DictCursor
 from GenericCache.GenericCache import GenericCache
+
+
+DUNSPlus4Matcher = re.compile('^(.*) [(]\d{4}[)]$')
+def strip_plus4(name):
+    m = DUNSPlus4Matcher.match(name)
+    if m is not None:
+        return m.group(1)
+    else:
+        return name
 
 
 class Importer(object):
