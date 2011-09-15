@@ -228,6 +228,14 @@ def node_details(contracts, grants):
     return (contract_details, grant_details)
 
 
+def autocomplete(request):
+    term = request.GET.get('term')
+    if term is not None:
+        names = [n.name for n in Name.objects.filter(name__startswith=request.GET.get('term'))]
+    else:
+        names = []
+    return HttpResponse(json.dumps(names), 'application/json')
+
 def name_details(request, fmt, entity_name):
     try:
         name = Name.objects.get(name=entity_name)

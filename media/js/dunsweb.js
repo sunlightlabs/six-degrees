@@ -118,6 +118,25 @@ $(document).ready(function(){
         $("#cancel-search-btn").show();
     });
 
+    $("#entity-name").autocomplete({source: '/duns/autocomplete'});
+    $("#entity-name").autocomplete({source:
+        function (request, callback) {
+            try {
+                if (request.term.length >= 3) {
+                    $.ajax('/duns/autocomplete', {
+                           data: request,
+                           success: function (data, textStatus, jqXHR) {
+                               callback(data);
+                           }});
+                } else {
+                    callback([]);
+                }
+            } catch (err) {
+                callback([]);
+            }
+        }
+    });
+
     var q = query_params['q'];
     if (q != null) {
         q = q.trim();
