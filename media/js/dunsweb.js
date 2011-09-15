@@ -143,7 +143,7 @@ $(document).ready(function(){
         q = q.trim();
         if (q.length > 0) {
             $("#entity-name").val(q);
-            lookup_duns_numbers(q);
+//            lookup_duns_numbers(q);
         }
     }   
 });

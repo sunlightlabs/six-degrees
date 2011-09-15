@@ -114,6 +114,15 @@ function ParticleGraph (root, options) {
         edge_strength: 0.007,
         spacer_strength: 1200,
         node_size: 5,
+        edge_color: [0xe0, 0xe0, 0xe0, 0xff],
+        node_center_color: [0x0, 0x0, 0x0, 0xff],
+        node_border_color: [0x20, 0x20, 0x20, 0xff],
+        selection_colors: {
+                node_center: null,
+                node_main: null,
+                node_border: null,
+                edge: null
+            },
         background: {r: 99, g: 99, b: 99, a: 255},
 		zoom_ctl_x: 5,
 		zoom_ctl_y: 5,
@@ -371,7 +380,7 @@ function ParticleGraph (root, options) {
                 var a_prtcl = edges[idx][0],
                     b_prtcl = edges[idx][1];
                 processing.strokeWeight(1.25/z_scale());
-                processing.stroke(0xe0, 0xe0, 0xe0, 0xff);
+                processing.stroke.apply(processing, opts.edge_color);
                 processing.line(a_prtcl.position.x, a_prtcl.position.y,
                                 b_prtcl.position.x, b_prtcl.position.y);
             }
@@ -383,13 +392,14 @@ function ParticleGraph (root, options) {
                 var prtcl = particles[idx];
                 var cx = prtcl.position.x,
                     cy = prtcl.position.y;
-                processing.noStroke();
-                processing.fill(0xe0, 0xe0, 0xe0, 0xff);
+                processing.strokeWeight(1.25/z_scale());
+                processing.stroke.apply(processing, opts.node_border_color);
+                processing.fill.apply(processing, opts.node_main_color);
                 processing.ellipse(cx,
                                    cy,
                                    opts.node_size * 5,
                                    opts.node_size * 5);
-                processing.fill(0, 0, 0, 255);
+                processing.fill.apply(processing, opts.node_center_color);
                 processing.ellipse(cx,
                                    cy,
                                    opts.node_size,
@@ -400,31 +410,37 @@ function ParticleGraph (root, options) {
             for (var idx = 0; idx < edge_selection.length; idx++) {
                 var a_prtcl = edge_selection[idx][0],
                     b_prtcl = edge_selection[idx][1],
-                    prtcl_idx = particle_selection.indexOf(b_prtcl);
-                set_color(prtcl_idx, deep_hue, function(r,g,b){
-                              processing.strokeWeight(1.25/z_scale());
-                              processing.stroke(r,g,b);
-                              processing.fill(r,g,b);
-                          });
+                    prtcl_idx = particle_selection.indexOf(b_prtcl),
+                    color_idx = prtcl_idx % opts.selection_colors.edge.length,
+                    color = opts.selection_colors.edge[color_idx];
+                processing.strokeWeight(1.25/z_scale());
+                processing.stroke.apply(processing, color);
+                processing.fill.apply(processing, color);
                 processing.line(a_prtcl.position.x, a_prtcl.position.y,
                                 b_prtcl.position.x, b_prtcl.position.y);
             }
 
             // Draw selected nodes
             for (var idx = 0; idx < particle_selection.length; idx++) {
-                var prtcl = particle_selection[idx];
+                var prtcl = particle_selection[idx],
+                    color_idx = particle_selection.length - idx,
+                    main_color_idx = color_idx % opts.selection_colors.node_main.length,
+                    main_color = opts.selection_colors.node_main[main_color_idx],
+                    center_color_idx = color_idx % opts.selection_colors.node_center.length,
+                    center_color = opts.selection_colors.node_center[center_color_idx],
+                    border_color_idx = color_idx % opts.selection_colors.node_border.length,
+                    border_color = opts.selection_colors.node_border[border_color_idx];
+
                 var cx = prtcl.position.x,
                     cy = prtcl.position.y;
-                set_color(particle_selection.length - idx, deep_hue, function(r,g,b){
-                              processing.strokeWeight(0);
-                              processing.stroke(r,g,b);
-                              processing.fill(r,g,b);
-                          });
+                processing.strokeWeight(1.25/z_scale());
+                processing.stroke.apply(processing, border_color);
+                processing.fill.apply(processing, main_color);
                 processing.ellipse(cx,
                                    cy,
                                    opts.node_size * 5,
                                    opts.node_size * 5);
-                processing.fill(0, 0, 0, 255);
+                processing.fill.apply(processing, center_color);
                 processing.ellipse(cx,
                                    cy,
                                    opts.node_size,
@@ -448,9 +464,8 @@ function ParticleGraph (root, options) {
             }
         };
         processing.setup = function(){
-            if (opts.background_image != null) {
+            if (opts.background_image != null) 
                 background_image = processing.loadImage(opts.background_image);
-            }
             processing.frameRate(opts.frames_per_second);
             processing.colorMode(processing.RGB);
             processing.size(opts.width, opts.height);
@@ -511,6 +526,14 @@ function ParticleGraph (root, options) {
         };
     };
 
+    if (opts.selection_colors.edge == null) 
+        opts.selection_colors.edge = generate_colors(30, deep_hue, 0xff);
+    if (opts.selection_colors.node_main == null) 
+        opts.selection_colors.node_main = generate_colors(30, deep_hue, 0xff);
+    if (opts.selection_colors.node_border == null) 
+        opts.selection_colors.node_border = generate_colors(30, black_hue, 0xff);
+    if (opts.selection_colors.node_center == null) 
+        opts.selection_colors.node_center = generate_colors(30, black_hue, 0xff);
     reset();
 }
 

@@ -10,7 +10,16 @@ var pastel_hue = function (n,phase) {
 };
 var deep_hue = function (n, phase) {
     return Math.sin(0.8979777 * n + phase) * 95 + 155;
-}
+};
+var black_hue = function (n, phase) {
+    return 0;
+};
+var deep_color = function (n) {
+    return [deep_hue(n, 0 + n), 
+            deep_hue(n, 2 + n),
+            deep_hue(n, 4 + n)]
+};
+
 var color = function (n, hue_func) { 
     return rgb2hex(hue_func(n, 0 + n), 
                    hue_func(n, 2 + n), 
@@ -25,3 +34,13 @@ var set_color = function (n, hue_func, setf) {
     return hex;
 };
 
+var generate_colors = function (n, hue_func, alpha) {
+    var colors = [];
+    for (var idx = 0; idx < n; idx++) {
+        colors.push([hue_func(idx, 0 + idx),
+                     hue_func(idx, 2 + idx),
+                     hue_func(idx, 4 + idx),
+                     alpha]);
+    }
+    return colors;
+};
