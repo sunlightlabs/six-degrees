@@ -67,13 +67,13 @@ function Crawler (options) {
     };
 
     var process_queues = function () {
-        if (duns_queue.length > 0) {
-            var duns = duns_queue.shift();
-            setTimeout(function(){ search_by_duns(duns); },
-                       opts.delay);
-        } else if (name_queue.length > 0) {
+        if (name_queue.length > 0) {
             var name = name_queue.shift();
             setTimeout(function(){ search_by_name(name); },
+                       opts.delay);
+        } else if (duns_queue.length > 0) {
+            var duns = duns_queue.shift();
+            setTimeout(function(){ search_by_duns(duns); },
                        opts.delay);
         } else {
             finish();
@@ -92,7 +92,7 @@ function Crawler (options) {
 
     this.start = function (seed, seed_type) {
         if (started || stopped || done ) {
-            console.log("Crawler objects are not restartable.");
+            throw "Crawler objects are not restartable.";
             return;
         }
 
@@ -105,7 +105,7 @@ function Crawler (options) {
             started = true;
             process_queues();
         } else {
-            console.log('Invalid crawler seed type: ' + seed_type);
+            throw ('Invalid crawler seed type: ' + seed_type);
         }
     };
 
