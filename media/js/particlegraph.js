@@ -49,7 +49,7 @@ function Centroid2D (smoothness, width, height) {
     Centroid2D.superclass.constructor.call(this, smoothness);
     this.width = width;
     this.height = height;
-    this.extents = { x_min: 0, x_max: width, y_min: 0, y_min: height };
+    this.extents = { x_min: 0, x_max: width, y_min: 0, y_max: height };
 }
 extend(Centroid2D, Smoother2D);
 Centroid2D.prototype.recalc = function (particles) {
@@ -118,7 +118,8 @@ function ParticleGraph (root, options) {
 		zoom_ctl_x: 5,
 		zoom_ctl_y: 5,
 		zoom_ctl_width: 165,
-		zoom_ctl_height: 25
+		zoom_ctl_height: 25,
+        debug: false
     };
     var opts = $.extend(true, {}, defaults);
         opts = $.extend(true, opts, options || {});
@@ -434,10 +435,12 @@ function ParticleGraph (root, options) {
             }
 
 			draw_zoom_control(processing);
-			processing.text('Particles: ' + particles.length, 5, opts.height - 80);
-			processing.text('Frame rate:' + frame_rate_buffer.mean() + ' (Setting: ' + opts.frames_per_second + ')', 5, opts.height - 20);
-			processing.text('applyForces: ' + physics.applyForcesTimings.mean(), 5, opts.height - 60);
-			processing.text('add_link queue: ' + that.add_link.queue.backlog_size(), 5, opts.height - 40);
+            if (opts.debug == true) {
+                processing.text('Particles: ' + particles.length, 5, opts.height - 80);
+                processing.text('Frame rate:' + frame_rate_buffer.mean() + ' (Setting: ' + opts.frames_per_second + ')', 5, opts.height - 20);
+                processing.text('applyForces: ' + physics.applyForcesTimings.mean(), 5, opts.height - 60);
+                processing.text('add_link queue: ' + that.add_link.queue.backlog_size(), 5, opts.height - 40);
+            }
         };
         processing.setup = function(){
             processing.frameRate(opts.frames_per_second);

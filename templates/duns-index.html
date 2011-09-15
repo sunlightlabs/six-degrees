@@ -17,7 +17,7 @@
     <div id="content">
         <div id="sidebar">
             <span id="search-form">
-                <input type="text" id="entity-name" value="General Electric">
+                <input type="text" id="entity-name" value="ORACLE CORPORATION">
                 <button id="show-entity-btn">Find</button>
             </span>
             <button id="cancel-search-btn">
@@ -25,11 +25,12 @@
                 Cancel
             </button>
             <br>
-			<span id="search-queue-length" style="display: none;"></span>
+			<div id="search-queue-length"></div>
 			<br>
 			<span id="low-frame-rate-warning" style="display: none;">The search has been stopped because your computer is having trouble processing more results.<br></span>
-            <ul id="node-details">
+            <ul id="node-route">
             </ul>
+
         </div>
 
         <div id="results">
@@ -41,17 +42,9 @@
             <canvas id="graph">
             </canvas>
         </div>
-    </div>
 
-	<div id="duns-result-tmpl">
-		<div class="duns-result" style="display: none;">
-			<span class="duns-result"></span>
-		</div>
-	</div>
-	<div id="names-result-tmpl">
-		<div class="names-result" style="display: none;">
-			<span class="names-result"></span>
-		</div>
-	</div>
+        <div id="node-details-container" class="clear">
+        </div>
+    </div>
 {% endblock %}
 

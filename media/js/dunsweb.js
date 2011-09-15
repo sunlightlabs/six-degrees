@@ -1,11 +1,25 @@
-function retrieve_node_details (selected_node) {
-    $("#node-details *").remove();
+function display_node_details (data, textStatus, jqXHR) {
+    var snippet = $(data);
+    $("#node-details-container *").remove();
+    $("#node-details-container").append(snippet);
+}
+
+function retrieve_node_details (node) {
+    $("#node-details-container *").remove();
+    $.ajax('/duns/details/' + encodeURIComponent(node.value) + '.html', {
+           data: 'q=',
+           success: display_node_details
+           });
+}
+
+function display_route_to_root (selected_node) {
+    $("#node-route *").remove();
 
     var create_element_for_node = function (node) {
         var elem = $("<li></li>");
         elem.text(node.value);
         elem.addClass(node.type + '-value');
-//        elem.click(node.type == 'duns' ? show_duns : show_name);
+        elem.click(function (event) { retrieve_node_details(node); });
         return elem;
     }
 
@@ -17,7 +31,7 @@ function retrieve_node_details (selected_node) {
         if (idx > 0) {
             element.prepend("<b>&raquo;&nbsp;</b>");
         }
-        $("#node-details").append(element);
+        $("#node-route").append(element);
     }
 }
 
@@ -45,8 +59,6 @@ $(document).ready(function(){
         $("#node-details *").remove();
         $("#overlay").show("Appear");
         var canvas = document.getElementById("graph");
-        $(canvas).attr("width", 1000);
-        $(canvas).attr("height", 700);
         var crawler = new Crawler({delay: 250});
         var graph = new ParticleGraph(seed, {node_size: 5,
                                              frames_per_second: 24,
@@ -54,8 +66,9 @@ $(document).ready(function(){
                                              spacer_strength: 1200,
                                              edge_strength: 0.007,
                                              target: canvas,
-                                             width: canvas.width,
-                                             height: canvas.height});
+                                             width: $(canvas).width(),
+                                             height: $(canvas).height(),
+                                             debug: ! (query_params['debug'] == null)});
         var p = new Processing(canvas, graph.sketch_proc);
 		$(graph).bind('paused', function (event) {
 			ui_ready();
@@ -66,10 +79,15 @@ $(document).ready(function(){
             $("#low-frame-rate-warning").show();
         });
         $("#show-entity-btn").click(function(){
-            p.exit();
+            console.log(p);
+            if (p != null) {
+                crawler.stop();
+                p.noLoop();
+                p = null; // Should be the only reference. Let the GC clean up the event bindings.
+            };
         });
         $(graph).bind('nodeSelected', function (event, node) {
-            retrieve_node_details(node);
+            display_route_to_root(node);
         });
         var ui_ready = function () {
             $("#cancel-search-btn").hide();

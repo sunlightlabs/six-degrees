@@ -1,3 +1,4 @@
+.clear { clear: both; }
 
 body {
 	font-family: sans-serif;
@@ -48,7 +49,7 @@ div#sidebar {
     width: 400px;
 }
 
-ul#node-details {
+ul#node-route {
     list-style-type: none;
 }
 
@@ -58,16 +59,26 @@ div.node-name {
 
 canvas#graph {
     margin: 0;
+    width: 800px;
+    height: 600px;
 }
 
 div#results {
     position: absolute;
     top: 0;
     left: 400px;
-	width: 1000px;
+	width: 800px;
+    height: 600px;
     padding: 0;
 	vertical-align: top;
 	font-family: sans-serif;
+}
+
+div#node-details-container {
+    position: absolute;
+    top: 600px;
+    left: 0;
+    width: 800px;
 }
 
 div#duns-results, div#names-results {
@@ -119,6 +130,21 @@ div#no-results-text {
 	width: 40%;
 }
 
-._jsPlumb_connector {
-	z-index: 0;
+div#node-details-container {
+    font-size: 9pt;
 }
+
+table.node-contracts, table.node-grants {
+}
+
+table.node-contracts > thead > tr > th {
+    white-space: nowrap;
+    text-align: left;
+}
+
+table.node-grants > thead > tr > th {
+    white-space: nowrap;
+    text-align: left;
+}
+
+

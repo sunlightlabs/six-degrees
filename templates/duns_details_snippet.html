@@ -1,0 +1,49 @@
+{% if contracts|length == 0 %}
+    <p>No contracts for {{ duns }}</p>
+{% else %}
+    <table class="node-contracts">
+        <caption>Contracts for {{ duns }}</caption>
+        <thead>
+            <tr><th>PIID</th>
+                <th>Fiscal Year</th>
+                <th>Product or Service</th>
+                <th>Vendor Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contract in contracts %}
+            <tr><td>{{ contract.piid }}</td>
+                <td>{{ contract.fiscal_year }}</td>
+                <td>{{ contract.psc_category_label }}</td>
+                <td>{{ contract.company_name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+{% if grants|length == 0 %}
+    <p>No grants for {{ name }}</p>
+{% else %}
+    <table class="node-grants">
+        <caption>Grants for {{ duns }}</caption>
+        <thead>
+            <tr><th>Award ID</th>
+                <th>Fiscal Year</th>
+                <th>CFDA Program</th>
+                <th>Recipient Name</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for grant in grants %}
+            <tr><td>{{ grant.federal_award_id }}</td>
+                <td>{{ grant.fiscal_year }}</td>
+                <td>{{ grant.cfda_program_number }} {{ grant.cfda_program_title }}</td>
+                <td>{{ grant.recipient_name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
