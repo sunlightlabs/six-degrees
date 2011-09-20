@@ -9,6 +9,7 @@ from operator import itemgetter
 from django.http import HttpResponse, HttpResponseServerError, Http404
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from django.views.decorators.cache import cache_page
+from django.db.models import Min, Max
 from django.core.cache import cache
 from duns.models import FPDS, FAADS, DUNS, Name
 from utils import parseint
@@ -127,10 +128,10 @@ NameBlacklist = [
 ]
 
 DUNSBlacklist = [
-    '0000000000000', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
-    '5571630810000', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
-    '7777777770000',
-    '1234567870000'  # 'MISCELLANEOUS FOREIGN CONTRACTORS', & others
+    '000000000', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
+    '557163081', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
+    '777777777',
+    '123456787'  # 'MISCELLANEOUS FOREIGN CONTRACTORS', & others
 ]
 
 def index(request):
@@ -156,7 +157,8 @@ def search_by_name(entity_name):
         duns_numbers = set( [g.duns.number for g in grants]
                           + [c.duns.number for c in contracts] )
         return [n for n in duns_numbers
-                  if parseint(n, 0) != 0]
+                  if parseint(n, 0) != 0
+                  and n not in DUNSBlacklist]
     except Name.DoesNotExist:
         return None
 
@@ -171,7 +173,7 @@ def search_by_duns(duns_number):
         contracts = duns.fpds.all()
         names = set( [g.recipient_name.name.upper() for g in grants] 
                    + [c.company_name.name.upper() for c in contracts] )
-        return list(names)
+        return list([n for n in names if n not in NameBlacklist])
     except DUNS.DoesNotExist:
         return None
 
@@ -209,21 +211,24 @@ def lookup_by_duns_number(request, duns_number):
 
 
 def node_details(contracts, grants):
-    contract_details_getter = lambda c: {'duns': c.duns.number,
-                                         'company_name': c.company_name.name,
-                                         'fiscal_year': c.fiscal_year,
-                                         'unique_transaction_id': c.unique_transaction_id,
-                                         'piid': c.piid,
-                                         'psc_category_label': PSCCategoryLabels.get(c.psc_category, '')}
+    def contract_details_getter(c):
+        return {'duns': c['duns__number'],
+                'name': c['company_name__name'],
+                'min_fiscal_year': c['fiscal_year__min'],
+                'max_fiscal_year': c['fiscal_year__max'],
+                'piid': c['piid'],
+                'psc_category_label': PSCCategoryLabels.get(c['psc_category'], '')}
     contract_details = [contract_details_getter(c) for c in contracts]
 
-    grant_details_getter = lambda g: {'duns': g.duns.number,
-                                      'recipient_name': g.recipient_name.name,
-                                      'fiscal_year': g.fiscal_year,
-                                      'unique_transaction_id': g.unique_transaction_id,
-                                      'federal_award_id': g.federal_award_id,
-                                      'federal_award_mod': g.federal_award_mod,
-                                      'obligation_action_date': g.obligation_action_date.isoformat()}
+    def grant_details_getter(g):
+        return {'duns': g['duns__number'],
+                'recipient_name': g['recipient_name__name'],
+                'min_fiscal_year': g['fiscal_year__min'],
+                'max_fiscal_year': g['fiscal_year__max'],
+                'federal_award_id': g['federal_award_id'],
+                'cfda_program_number': g['cfda_program_number'],
+                'cfda_program_title': g['cfda_program_title'],
+                'obligation_action_date': g['obligation_action_date'].isoformat()}
     grant_details = [grant_details_getter(g) for g in grants]
     return (contract_details, grant_details)
 
@@ -231,7 +236,7 @@ def node_details(contracts, grants):
 def autocomplete(request):
     term = request.GET.get('term')
     if term is not None:
-        names = [n.name for n in Name.objects.filter(name__startswith=request.GET.get('term'))]
+        names = [n.name for n in Name.objects.filter(name__istartswith=request.GET.get('term'))]
     else:
         names = []
     return HttpResponse(json.dumps(names), 'application/json')
@@ -239,8 +244,19 @@ def autocomplete(request):
 def name_details(request, fmt, entity_name):
     try:
         name = Name.objects.get(name=entity_name)
-        contracts = name.fpds.all()
-        grants = name.faads.all()
+        contracts = name.fpds.values('piid', 'company_name__name', 
+                                     'duns__number', 'psc_category'
+                                    ).annotate(Min('fiscal_year'), 
+                                               Max('fiscal_year')
+                                              ).order_by('fiscal_year__min')
+        grants = name.faads.values('duns__number', 'recipient_name__name',
+                                   'federal_award_id', 
+                                   'cfda_program_title',
+                                   'cfda_program_number',
+                                   'obligation_action_date'
+                                  ).annotate(Min('fiscal_year'),
+                                             Max('fiscal_year')
+                                            ).order_by('fiscal_year__min')
         (contract_details, grant_details) = node_details(contracts, grants)
         params = {'querytype': 'namedetails',
                   'name': entity_name,
@@ -257,8 +273,17 @@ def name_details(request, fmt, entity_name):
 def duns_details(request, fmt, duns_number):
     try:
         duns = DUNS.objects.get(number=duns_number)
-        contracts = duns.fpds.all()
-        grants = duns.faads.all()
+        contracts = duns.fpds.values('piid', 'company_name__name', 
+                                     'duns__number', 'psc_category'
+                                    ).annotate(Min('fiscal_year'), 
+                                               Max('fiscal_year'))
+        grants = duns.faads.values('duns__number', 'recipient_name__name',
+                                   'federal_award_id', 
+                                   'cfda_program_title',
+                                   'cfda_program_number',
+                                   'obligation_action_date'
+                                  ).annotate(Min('fiscal_year'),
+                                             Max('fiscal_year'))
         (contract_details, grant_details) = node_details(contracts, grants)
         params = {'querytype': 'dunsdetails',
                   'duns': duns_number,
