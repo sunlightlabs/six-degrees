@@ -59,19 +59,22 @@ class Importer(object):
                         "LIMIT %s")).format(fields=", ".join(self.src_fields),
                                             table=self.src_table)
 
-        with closing(self.dbconn.cursor(cursor_factory=DictCursor)) as cur:
-            cur.execute(sql, (self.checkpoint, nrows))
-            rows = cur.fetchall()
-            if len(rows) == 0:
-                raise Importer.Done()
+        try:
+            with closing(self.dbconn.cursor(cursor_factory=DictCursor)) as cur:
+                cur.execute(sql, (self.checkpoint, nrows))
+                rows = cur.fetchall()
+                if len(rows) == 0:
+                    raise Importer.Done()
 
-            for row in rows:
-                self.record(row)
-                self.progress_tick()
+                for row in rows:
+                    self.record(row)
+                    self.progress_tick()
 
-                data_commons_id = int(row['id'])
-                if data_commons_id > self.checkpoint:
-                    self.checkpoint = data_commons_id
+                    data_commons_id = int(row['id'])
+                    if data_commons_id > self.checkpoint:
+                        self.checkpoint = data_commons_id
+        except Importer.Done:
+            pass
 
     def run(self, stepsize):
         """Imports all new records. Reports progress after every `stepsize` rows."""

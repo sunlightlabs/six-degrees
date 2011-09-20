@@ -16,7 +16,7 @@ class FAADSImporter(Importer):
 
     def record(self, dbrow):
         """Transforms each raw table row into data model objects."""
-        raw_rcpt_name = strip_plus4(dbrow['recipient_name'].strip())
+        raw_rcpt_name = strip_plus4(dbrow['recipient_name'].strip()).decode('utf8').encode('utf8', 'replace')
         raw_duns = dbrow['duns_no'][:9].strip()
 
         if raw_rcpt_name != '' and raw_duns != '':

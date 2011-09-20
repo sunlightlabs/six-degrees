@@ -10,14 +10,14 @@ class FPDSImporter(Importer):
         Importer.__init__(self, 'contracts_contract', 
                           ('unique_transaction_id', 'id',
                            'dunsnumber', 'parentdunsnumber',
-                           'vendorlegalorganizationname', 'piid',
+                           'vendorname', 'vendorlegalorganizationname', 'piid',
                            'productorservicecode', 'psc_cat', 
                            'fiscal_year'),
                           FPDS, dbconn)
 
     def record(self, dbrow):
         """Transforms each raw table row into data model objects."""
-        raw_vndr_name = strip_plus4(dbrow['vendorlegalorganizationname'].strip())
+        raw_vndr_name = strip_plus4(dbrow['vendorlegalorganizationname'].strip() or dbrow['vendorname'].strip()).decode('utf8').encode('utf8', 'replace')
         raw_duns = dbrow['dunsnumber'][:9].strip()
         raw_parent_duns = dbrow['parentdunsnumber'][:9].strip()
 
