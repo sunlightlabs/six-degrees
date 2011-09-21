@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'django.contrib.humanize',
     'django_extensions',
+    'postmark',
     'duns',
 )
 
@@ -146,7 +147,6 @@ CACHES = {
         'MAX_ENTRIES': 10000
     }
 }
-
 
 try:
     from local_settings import *

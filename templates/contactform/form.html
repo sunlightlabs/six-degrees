@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+
+<form action="{% url contactform %}" method="POST">
+	{% csrf_token %}
+
+	<p id="name-fld-cont">
+		<label class="contact" for="id_name" value="Name">Name</label>
+		{{ form.name }}
+	</p>
+	<p id="email-fld-cont">
+		<label class="contact" for="id_email" value="Email">Email</label>
+		{{ form.email }}
+	</p>
+	<p id="body-fld-cont">
+		<label class="contact" for="id_body" value="Message:">Message:</label>
+		<p>
+		{{ form.body }}
+		</p>
+	</p>
+
+	<input type="submit" value="Send">
+</form>
+
+{% endblock %}
+
