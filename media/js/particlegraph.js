@@ -123,7 +123,7 @@ function ParticleGraph (root, options) {
                 node_border: null,
                 edge: null
             },
-        background: {r: 99, g: 99, b: 99, a: 255},
+        background: [99, 99, 99, 255],
 		zoom_ctl_x: 5,
 		zoom_ctl_y: 5,
 		zoom_ctl_width: 165,
@@ -365,7 +365,7 @@ function ParticleGraph (root, options) {
             processing.translate(-centroid.x(), -centroid.y());
 
             if (background_image == null) {
-                processing.background(opts.background.r, opts.background.g, opts.background.b, opts.background.a);
+                processing.background.apply(processing, opts.background);
             } else {
                 processing.image(background_image, -opts.width / 2, -opts.height / 2);
             }
