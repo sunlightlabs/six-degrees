@@ -15,11 +15,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', 'index'),
-    url(r'^duns/autocomplete', 'duns.views.autocomplete'),
-    url(r'^duns/details/(?P<duns_number>[0-9]+)\.(?P<fmt>html|json)', 'duns.views.duns_details'),
-    url(r'^duns/details/(?P<entity_name>.+)\.(?P<fmt>html|json)?', 'duns.views.name_details'),
-    url(r'^duns/(?P<duns_number>[0-9]+)', 'duns.views.lookup_by_duns_number'),
-    url(r'^duns/(?P<entity_name>.+)', 'duns.views.lookup_by_name'),
-    url(r'^duns$', 'duns.views.index'),
+    url(r'^$', 'duns.views.index'),
+    url(r'^contact', include('contactform.urls')),
+    url(r'^duns[/]?', include('duns.urls')),
 )
