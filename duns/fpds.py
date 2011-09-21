@@ -21,7 +21,7 @@ class FPDSImporter(Importer):
         raw_duns = dbrow['dunsnumber'][:9].strip()
         raw_parent_duns = dbrow['parentdunsnumber'][:9].strip()
 
-        if len(raw_vndr_name) > 0 and (len(raw_duns) > 0 or len(raw_parent_duns) > 0):
+        if len(raw_vndr_name) > 0 and (len(raw_duns) > 0 or len(raw_parent_duns) > 0) and dbrow['fiscal_year'] is not None:
             vndr_name = self._name(raw_vndr_name)
             duns = self._duns(raw_duns) if len(raw_duns) > 0 else None
             parent_duns = self._duns(raw_parent_duns) if len(raw_parent_duns) > 0 else None
