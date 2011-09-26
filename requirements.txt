@@ -7,3 +7,6 @@ gunicorn==0.12.0
 PyGreSQL==4.0
 psycopg2
 GenericCache
+django-postmark
+django-extensions
+python-memcached

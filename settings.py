@@ -1,6 +1,6 @@
 # Django settings for website project.
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -88,6 +88,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -114,7 +115,11 @@ INSTALLED_APPS = (
     'django_extensions',
     'postmark',
     'duns',
+    'debug_toolbar'
 )
+
+
+INTERNAL_IPS = ('127.0.0.1',)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
