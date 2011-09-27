@@ -53,7 +53,7 @@ table { border-collapse:collapse; border-spacing:0; }
 hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
 input, select { vertical-align:middle; }
 
-body { color: #6f6965; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; line-height: 22px; font-size: 13px; background: url("../images/below_green_bg.png") center 44px repeat-x #F8F6EC; }
+body { color: #89827e; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; line-height: 23px; font-size: 13px; background: url("../images/below_green_bg.png") center 44px repeat-x #F8F6EC; }
 select, input, textarea, button { font: 99% sans-serif; }
 button.disabled { opacity: 0.3; filter: alpha(opacity=30); -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)"; }
 pre, code, kbd, samp { font-family: monospace, sans-serif; }
@@ -145,19 +145,23 @@ header nav li a { background: url(../images/bg_navCircle.jpg) left 4px no-repeat
 header nav li.first { background: none;}
 
 .textReplace { text-indent: -9999em; display: block;}
-.tip { font-family: Georgia, "Times New Roman", Times, serif; font-style: oblique; color: #8a8581; line-height: 17px; margin-bottom: 25px;}
+.tip { font-family: Georgia, "Times New Roman", Times, serif; font-style: oblique; color: #a09b97; line-height: 17px; margin-bottom: 25px;}
 
 #featureArea { background: url(../images/divider_horiz.png) left bottom repeat-x; padding-left: 65px; margin-bottom: 40px; padding-bottom: 20px; margin-top: 5px;}
 #featureArea h2 { width: 302px; height: 36px; background: url(../images/feature_title.png) top left no-repeat; margin-bottom: 10px;}
 #featureArea p { font-size: 120%; padding-left: 15px;}
 
 #search_btn { background: url(../images/btn_search.jpg) top left no-repeat; width: 113px; height: 35px;}
+#search_btn:hover { background: url(../images/btn_search.jpg) bottom left no-repeat; }
+#submit_btn { background: url(../images/btn_submit.jpg) top left no-repeat; width: 113px; height: 30px;}
+#submit_btn:hover { background: url(../images/btn_submit.jpg) bottom left no-repeat; }
 
-input { border: 1px solid #d3d1c7; -moz-border-radius: 8px; -webkit-border-radius: 8px; padding: 10px 12px; float: left; margin-right: 15px; width: 300px;}
+input { color: #a09b97; border: 1px solid #d3d1c7; -moz-border-radius: 8px; -webkit-border-radius: 8px; padding: 10px 12px; float: left; margin-right: 15px; width: 300px;}
 
 #ribbon { background: url(../images/bg_ribbontitle.jpg) top left no-repeat; height: 32px; color: #fff; font-family: Georgia, "Times New Roman", Times, serif; font-weight: normal; padding: 5px 0 0 30px;}
+.companyContent { padding-left: 30px;}
 
-h2 { font-size: 200%; font-style: normal; line-height: 30px; margin-bottom: 25px;}
+h2 { font-size: 200%; font-weight: normal; line-height: 30px; margin-bottom: 25px; color: #352b2b;}
 h3 { font-size: 120%;}
 
 #homeColumn { width: 685px; float: left;}
@@ -172,6 +176,14 @@ h3 { font-size: 120%;}
 .copy li { list-style-type: disc; margin-left: 35px; margin-bottom: 5px;}
 .copy ul { margin-bottom: 25px;}
 
+footer { background: url(../images/divider_horiz.png) left top repeat-x; margin: 40px auto 60px; padding-top: 40px;}
+footer h3 { background: url(../images/footer_title.jpg) top left no-repeat; margin-bottom: 3px;}
+
+#sunlightBadge { float: left; margin-right: 20px;} 
+#footerText { float: left; width: 700px;}
+footer span.tip { display: block; margin-bottom: 15px;}
+
+footer input { padding: 8px 10px;}
 
 
 
