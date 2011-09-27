@@ -2,14 +2,26 @@
 
 <html>
 	<head>
-test
 		{% block head %}
         <title>Six Degrees of Corporations</title>
 		{% endblock %}
 	</head>
 
 	<body>
-		{% block body %}
-		{% endblock %}
+		    <header>
+		        <h1><a class="textReplace" href="/">Six Degrees of Corporations</a></h1>
+		        <nav>
+		            <ul>
+		                <li><a href="/">About</a></li>
+		                <li><a href="/">Existing Identifer Systems</a></li>
+		                <li><a href="/">Case Study</a></li>
+		                <li><a href="/">Resources</a></li>
+		            </ul>    
+		        </nav>    
+		    </header>
+		    <div id="main">
+		        {% block body %}
+		        {% endblock %}
+		    </div>
 	</body>
 </html>
