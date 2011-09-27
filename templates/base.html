@@ -6,22 +6,41 @@
         <title>Six Degrees of Corporations</title>
 		{% endblock %}
 	</head>
-
+    <link rel="stylesheet" href="/media/css/duns.css" type="text/css" media="screen" />
 	<body>
-		    <header>
-		        <h1><a class="textReplace" href="/">Six Degrees of Corporations</a></h1>
-		        <nav>
-		            <ul>
-		                <li><a href="/">About</a></li>
-		                <li><a href="/">Existing Identifer Systems</a></li>
-		                <li><a href="/">Case Study</a></li>
-		                <li><a href="/">Resources</a></li>
-		            </ul>    
-		        </nav>    
-		    </header>
-		    <div id="main">
-		        {% block body %}
-		        {% endblock %}
-		    </div>
+	    <div class="sf_mini_header">
+        	<div class="sf_mini_header_nav_wrapper">
+        		<h1 id="sunFoundation"><a class="textReplace" href="http://www.sunlightfoundation.com">Sunlight Foundation</a></h1>
+        		<nav>
+            		<ul>
+            			<li class="about"> <a href="http://sunlightfoundation.com/about/">About</a>
+            			</li>
+            			<li class="blog"> <a href="http://sunlightfoundation.com/blog/">Blog</a>
+            			</li>
+            			<li class="projects"> <a href="http://sunlightfoundation.com/projects/">Projects</a>
+            			</li>
+            			<li class="contact"> <a href="http://sunlightfoundation.com/contact/">Contact</a>
+            			</li>
+            		</ul>
+            	</nav>
+        		<div class="clear"></div>
+        	</div>
+        </div>
+	    <header>
+	        <h1><a class="textReplace" href="/">Six Degrees of Corporations</a></h1>
+	        <nav>
+	            <ul>
+	                <li class="first"><a href="">About</a></li>
+	                <li><a href="/existing-identifiers">Existing Identifer Systems</a></li>
+	                <li><a href="/singapore-uen">Case Study</a></li>
+	                <li><a href="/resources">Resources</a></li>
+	            </ul>    
+	        </nav>   
+	        <div class="clear"></div> 
+	    </header>
+	    <div id="main">
+	        {% block body %}
+	        {% endblock %}
+	    </div>
 	</body>
 </html>

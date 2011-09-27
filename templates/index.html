@@ -1,19 +1,22 @@
 {% extends "base.html" %}
 
 {% block body %}
-    <div id="featureArea">
-        <h2 class="textReplace">Fingerprinting the Private Sector</h2>
-        <p>Currently there is no effective unique identifier system for companies that operate within the US. This has huge implications for corporate accountability, disclosure in political giving, evaluation of systemic risk in financial markets, oversight of government contracts and more.</p>
-        <p>Play with the visualization below, read an overview of the <a href="#">major federal systems</a>, or find a <a href="#">case study</a> of one country that’s successfully overcome this problem.</p>
+    <div id="homeColumn">
+        <div id="featureArea">
+            <h2 class="textReplace">Fingerprinting the Private Sector</h2>
+            <p>Currently there is no effective unique identifier system for companies that operate within the US. This has huge implications for corporate accountability, disclosure in political giving, evaluation of systemic risk in financial markets, oversight of government contracts and more.</p>
+            <p>Play with the visualization below, read an overview of the <a href="#">major federal systems</a>, or find a <a href="#">case study</a> of one country that’s successfully overcome this problem.</p>
+        </div>
+        <div id="mainContent">
+            <h3 id="ribbon">Find a Company</h3>
+            <p class="tip">The visualization below illustrates the problems with one of the most common corporate identifiers (DUNS numbers). Type in a name of a company to see the system at work.</p>
+            <form action="/search/" method="get">
+                <input type="search" name="search">
+                <button id="search_btn" type="submit">
+                     <span>Search</span>
+                </button>
+            </form>    
+        </div>    
     </div>
-    <div id="mainContent">
-        <h3>Find a Company</h3>
-        <p class="tip">The visualization below illustrates the problems with one of the most common corporate identifiers (DUNS numbers). Type in a name of a company to see the system at work.</p>
-        <form action="/search/" method="get">
-            <input type="search" name="search">
-            <button type="submit">
-                 <span>Search</span>
-            </button>
-        </form>    
-    </div>    
+    <img id="imgHome" alt="examining a finger print" src="/media/images/img_fingerprint.jpg"/>
 {% endblock body %}
