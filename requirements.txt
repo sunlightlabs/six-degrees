@@ -10,3 +10,4 @@ GenericCache
 django-postmark
 django-extensions
 python-memcached
+django-debug-toolbar
