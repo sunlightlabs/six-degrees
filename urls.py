@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.simple import direct_to_template
-
+from django.conf import settings
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -21,4 +21,8 @@ urlpatterns = patterns('',
     url(r'^resources/$', direct_to_template, {'template': 'resources.html'}),
     url(r'^contact', include('contactform.urls')),
     url(r'^duns[/]?', include('duns.urls')),
+)
+
+urlpatterns += patterns('',
+    url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )
