@@ -11,3 +11,5 @@ TAGS
 *.swp
 *.swo
 *.xlsx
+*.dot
+*.dot.???
