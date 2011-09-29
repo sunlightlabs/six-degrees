@@ -3,11 +3,17 @@
 <html>
 	<head>
 		{% block head %}
+		<!--[if lt IE 9]>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+		<![endif]-->
         <title>Six Degrees of Corporations</title>
+		{% endblock %}
+		{% block head_epilogue %}
 		{% endblock %}
 	</head>
     <link rel="stylesheet" href="/media/css/duns.css" type="text/css" media="screen" />
 	<body>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
 	    <div class="sf_mini_header">
         	<div class="sf_mini_header_nav_wrapper">
         		<h1 id="sunFoundation"><a class="textReplace" href="http://www.sunlightfoundation.com">Sunlight Foundation</a></h1>
@@ -65,6 +71,14 @@
                 </form>
             </div>
             <div class="clear"></div>
-	    </footer>    
+	    </footer>
+		<!--[if lt IE 9]>
+		<script>
+			CFInstall.check({
+				mode: "overlay",
+				destination: window.location,
+			});
+		</script>
+		<![endif]-->
 	</body>
 </html>

@@ -6,21 +6,23 @@ var deep_colors = [
     [102, 248, 129, 255]
 ];
 var GraphOptions = {
-    node_size: 5,
+    node_size: 4,
     frames_per_second: 24,
     updates_per_second: 12,
-    spacer_strength: 1200,
+    spacer_strength: 600,
     edge_strength: 0.007,
     background: [0, 0, 0, 0],
+    label_size: 16,
+    label_color: [0, 0, 0, 255],
+    label_background: [0xff, 0xff, 0xff, 0xa0],
+    label_border_color: [0xc0, 0xc0, 0xc0, 0x70],
     edge_color: [0xe0, 0xe0, 0xe0, 0xff],
-    node_center_color: [0x0, 0x0, 0x0, 0xff],
-    node_main_color: [0xe0, 0xe0, 0xe0, 0xff],
-    node_border_color: [0x20, 0x20, 0x20, 0xff],
+    node_main_color: [251, 248, 241, 255],
+    node_border_color: [167, 158, 153, 255],
     selection_colors: {
-        node_center: null,
-        node_main: deep_colors,
-        node_border: null,
-        edge: deep_colors,
+        node_main: [[251, 248, 241, 255]],
+        node_border: [[230, 48, 9, 255], [205, 123, 23, 255]],
+        edge: [[0xe0, 0xe0, 0xe0, 0xff]]
     }
 };
 
@@ -67,7 +69,7 @@ function ui_ready () {
 };
 
 function start_crawler (debug) {
-    var seed = $("#entity-name").val().toUpperCase();
+    var seed = $("#company-name").val().toUpperCase();
 
     $("#results-graph-container *").remove();
     $("#node-details *").remove();
@@ -96,8 +98,8 @@ function start_crawler (debug) {
             p = null; // Should be the only reference. Let the GC clean up the event bindings.
         };
     };
-    $("#show-entity-btn").click(cancel_crawler);
-    $("#entity-name").keyup(function(event){
+    $("#search_btn").click(cancel_crawler);
+    $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {
             cancel_crawler(event);
         }
@@ -145,45 +147,36 @@ $(document).ready(function(){
         return b;
     })(window.location.search.substr(1).split('&'));
     
+    $("#graph").bind("selectstart", function (event) { event.preventDefault(); });
+
     $("#cancel-search-btn").hide();
     $("#cancel-search-btn").click(function(){
         $("#cancel-search-btn").hide();
     });
-    $("#show-entity-btn").click(function(event){
+    $("#search_btn").click(function(event){
         start_crawler(!(query_params['debug'] == null));
+        event.preventDefault();
     });
-    $("#entity-name").keyup(function(event){
+    $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {
-            $("#entity-name").autocomplete('close');
             start_crawler(!(query_params['debug'] == null));
         }
+        event.preventDefault();
     });
 
-    $("#entity-name").autocomplete({source: '/duns/autocomplete'});
-    $("#entity-name").autocomplete({source:
-        function (request, callback) {
-            try {
-                if (request.term.length >= 3) {
-                    $.ajax('/duns/autocomplete', {
-                           data: request,
-                           success: function (data, textStatus, jqXHR) {
-                               callback(data);
-                           }});
-                } else {
-                    callback([]);
-                }
-            } catch (err) {
-                callback([]);
-            }
+    if(typeof String.prototype.trim !== 'function') {
+        String.prototype.trim = function() {
+            return this.replace(/^\s+|\s+$/g, ''); 
         }
-    });
+    }
 
-    var q = query_params['q'];
+    var q = query_params['search'];
     if (q != null) {
         q = q.trim();
+        
         if (q.length > 0) {
-            $("#entity-name").val(q);
+            $("#company-name").val(q);
             start_crawler(!(query_params['debug'] == null));
         }
-    }   
+    }
 });

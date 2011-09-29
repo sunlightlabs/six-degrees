@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
+{% block head_epilogue %}
+	<script type="text/javascript" src="media/js/jquery-1.5.1.min.js"></script>
+	<script type="text/javascript" src="media/js/jquery.mousewheel.min.js"></script>
+	<script type="text/javascript" src="media/js/traer.js"></script>
+	<script type="text/javascript" src="media/js/processing-1.3.0-api.js"></script>
+	<script type="text/javascript" src="media/js/base64.js"></script>
+	<script type="text/javascript" src="media/js/extend.js"></script>
+	<script type="text/javascript" src="media/js/ratelimitedcall.js"></script>
+	<script type="text/javascript" src="media/js/Timer.js"></script>
+	<script type="text/javascript" src="media/js/meanbuffer.js"></script>
+	<script type="text/javascript" src="media/js/crawler.js"></script>
+	<script type="text/javascript" src="media/js/color.js"></script>
+	<script type="text/javascript" src="media/js/particlegraph.js"></script>
+	<script type="text/javascript" src="media/js/dunsweb.js"></script>
+{% endblock %}
+
 {% block body %}
     <div id="homeColumn">
         <div id="featureArea">
@@ -10,13 +26,15 @@
         <div id="mainContent">
             <h3 id="ribbon">Find a Company</h3>
             <p class="tip companyContent">The visualization below illustrates the problems with one of the most common corporate identifiers (DUNS numbers). Type in a name of a company to see the system at work.</p>
-            <form class="companyContent" action="/search/" method="get">
-                <input type="search" name="search">
+            <form class="companyContent" method="get">
+                <input type="search" id="company-name" name="search">
                 <button id="search_btn" type="submit">
                      <span>Search</span>
                 </button>
-            </form>    
-        </div>    
+            </form>
+			<canvas id="graph">
+			</canvas>
+        </div>
     </div>
     <img id="imgHome" alt="examining a finger print" src="/media/images/img_fingerprint.jpg"/>
 {% endblock body %}

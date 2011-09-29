@@ -239,7 +239,7 @@ div.node-name {
 canvas#graph {
     background: transparent;
     margin: 0;
-    width: 800px;
+    width: 940px;
     height: 600px;
     outline: none;
 }
