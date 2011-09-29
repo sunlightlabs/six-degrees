@@ -390,7 +390,7 @@ function ParticleGraph (root, options) {
 			frame_rate_buffer.put(processing.__frameRate);
 			if (running == true) {
 				if (processing.frameCount > opts.frames_per_second * 5) {
-					if (frame_rate_buffer.mean() < opts.frames_per_second) {
+					if (frame_rate_buffer.mean() < 6) {
 						$(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
 					}
 				}
