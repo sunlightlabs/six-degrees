@@ -9,7 +9,7 @@ from operator import itemgetter
 from django.http import HttpResponse, HttpResponseServerError, Http404
 from django.shortcuts import render, render_to_response, redirect, get_object_or_404
 from django.views.decorators.cache import cache_page
-from django.db.models import Min, Max
+from django.db.models import Min, Max, Count
 from django.core.cache import cache
 from duns.models import FPDS, FAADS, DUNS, Name
 from utils import parseint
@@ -121,17 +121,19 @@ PSCCategoryLabels = {
 
 NameBlacklist = [
     'NO DATA FROM D AND B',
+    'UNRESOLVED VENDOR NAME',
     'ENVIRONMENTAL PROTECTION AGENCY',
     'MISCELLANEOUS FOREIGN CONTRACT',
     'MISCELLANEOUS FOREIGN CONTRACTORS',
-    'J & B TRUCK REPAIR SERVICE',
+    'J & B TRUCK REPAIR SERVICE'
 ]
 
 DUNSBlacklist = [
     '000000000', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
     '557163081', # 'ENVIRONMENTAL PROTECTION AGENCY', & others
     '777777777',
-    '123456787'  # 'MISCELLANEOUS FOREIGN CONTRACTORS', & others
+    '123456787',  # 'MISCELLANEOUS FOREIGN CONTRACTORS', & others
+    '123456789'
 ]
 
 def index(request):
@@ -152,10 +154,16 @@ def search_by_name(entity_name):
 
     try:
         nm = Name.objects.get(name=entity_name)
-        grants = nm.faads.all()
-        contracts = nm.fpds.all()
-        duns_numbers = set( [g.duns.number for g in grants]
-                          + [c.duns.number for c in contracts] )
+        grant_duns_counts = (nm.faads
+                             .values('duns__number')
+                             .annotate(Count('duns__number'))
+                             .order_by('-duns__number__count'))
+        contract_duns_counts = (nm.fpds
+                                .values('duns__number')
+                                .annotate(Count('duns__number'))
+                                .order_by('-duns__number__count'))
+        duns_numbers = set( [g['duns__number'] for g in grant_duns_counts]
+                          + [c['duns__number'] for c in contract_duns_counts] )
         return [n for n in duns_numbers
                   if parseint(n, 0) != 0
                   and n not in DUNSBlacklist]
@@ -169,11 +177,17 @@ def search_by_duns(duns_number):
 
     try:
         duns = DUNS.objects.get(number=duns_number)
-        grants = duns.faads.all()
-        contracts = duns.fpds.all()
-        names = set( [g.recipient_name.name.upper() for g in grants] 
-                   + [c.company_name.name.upper() for c in contracts] )
-        return list([n for n in names if n not in NameBlacklist])
+        grant_name_counts = (duns.faads
+                             .values('recipient_name__name')
+                             .annotate(Count('recipient_name__name'))
+                             .order_by('-recipient_name__name__count'))
+        contract_name_counts = (duns.fpds
+                                .values('company_name__name')
+                                .annotate(Count('company_name__name'))
+                                .order_by('-company_name__name__count'))
+        names = set( [g['recipient_name__name'].upper() for g in grant_name_counts]
+                   + [c['company_name__name'].upper() for c in contract_name_counts] )
+        return [n for n in names if n not in NameBlacklist]
     except DUNS.DoesNotExist:
         return None
 

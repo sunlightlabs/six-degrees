@@ -441,7 +441,7 @@ function ParticleSystem(drag) {
     this.integrator = new RungeKuttaIntegrator(this);
 	this.hasDeadParticles = false;
 	this.timer = new Timer();
-	this.applyForcesTimings = new MeanBuffer(1000);
+	this.applyForcesTimings = new MeanBuffer(100);
 
 	var argc = arguments.length;
 	if (drag == null) {
