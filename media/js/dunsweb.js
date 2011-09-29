@@ -1,28 +1,21 @@
-var deep_colors = [
-// [red, green, blue, alpha],
-    [155, 241, 83, 255],
-    [244, 89, 119, 255],
-    [97, 110, 249, 255],
-    [102, 248, 129, 255]
-];
 var GraphOptions = {
     node_size: 4,
     frames_per_second: 24,
     updates_per_second: 12,
-    spacer_strength: 600,
+    spacer_strength: 800,
     edge_strength: 0.007,
     background: [0, 0, 0, 0],
     label_size: 16,
     label_color: [0, 0, 0, 255],
     label_background: [0xff, 0xff, 0xff, 0xa0],
     label_border_color: [0xc0, 0xc0, 0xc0, 0x70],
-    edge_color: [0xe0, 0xe0, 0xe0, 0xff],
+    edge_color: [173, 159, 156, 140],
     node_main_color: [251, 248, 241, 255],
-    node_border_color: [167, 158, 153, 255],
+    node_border_color: [173, 158, 156, 200],
     selection_colors: {
         node_main: [[251, 248, 241, 255]],
         node_border: [[230, 48, 9, 255], [205, 123, 23, 255]],
-        edge: [[0xe0, 0xe0, 0xe0, 0xff]]
+        edge: [[173, 159, 156, 255]]
     }
 };
 
@@ -63,13 +56,12 @@ function display_route_to_root (selected_node) {
     }
 }
 
-function ui_ready () {
-    $("#cancel-search-btn").hide();
-    $("#low-frame-rate-warning").hide();
-};
-
 function start_crawler (debug) {
-    var seed = $("#company-name").val().toUpperCase();
+    $("#low-frame-rate-warning").hide();
+    var seed = $("#company-name").val();
+    if (seed == null)
+        return;
+    seed = seed.toUpperCase();
 
     $("#results-graph-container *").remove();
     $("#node-details *").remove();
@@ -83,13 +75,10 @@ function start_crawler (debug) {
                                                    debug: debug});
     var graph = new ParticleGraph(seed, graph_options);
     var p = new Processing(canvas, graph.sketch_proc);
-    $(graph).bind('paused', function (event) {
-        ui_ready();
-    });
     $(graph).bind('lowframerate', function (event, frame_rate) {
         setTimeout(graph.pause, 15 * 1000);
         crawler.stop();
-        $("#low-frame-rate-warning").show();
+        $("#low-frame-rate-warning").fadeIn();
     });
     var cancel_crawler = function (event) {
         if (p != null) {
@@ -132,6 +121,7 @@ function start_crawler (debug) {
 
     crawler.start(seed, 'name');
     $("#cancel-search-btn").show();
+    $("#graph:hidden").fadeIn(1200);
 }
 
 $(document).ready(function(){
@@ -154,8 +144,10 @@ $(document).ready(function(){
         $("#cancel-search-btn").hide();
     });
     $("#search_btn").click(function(event){
-        start_crawler(!(query_params['debug'] == null));
         event.preventDefault();
+        start_crawler(!(query_params['debug'] == null));
+//        window.location = window.location + '#jump-to-graph';
+//        window.scrollTo(0, $("#jump-to-graph").offset()[1]);
     });
     $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {

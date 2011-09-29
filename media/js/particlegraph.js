@@ -1,3 +1,42 @@
+function byte2hex (n) {
+    var nybHexString = "0123456789ABCDEF";
+    return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+}
+function rgb2hex (r,g,b) {
+    return '#' + byte2hex(r) + byte2hex(g) + byte2hex(b);
+}
+function pastel_hue (n, phase) {
+    return Math.sin(0.8979777 * n + phase) * 45 + 205; 
+};
+function deep_hue (n, phase) {
+    return Math.sin(0.8979777 * n + phase) * 95 + 155;
+};
+function black_hue (n, phase) {
+    return 0;
+};
+function deep_color (n) {
+    return [deep_hue(n, 0 + n), 
+            deep_hue(n, 2 + n),
+            deep_hue(n, 4 + n)]
+};
+
+function color (n, hue_func) {
+    return rgb2hex(hue_func(n, 0 + n), 
+                   hue_func(n, 2 + n), 
+                   hue_func(n, 4 + n)); 
+};
+
+function generate_colors (n, hue_func, alpha) {
+    var colors = [];
+    for (var idx = 0; idx < n; idx++) {
+        colors.push([hue_func(idx, 0 + idx),
+                     hue_func(idx, 2 + idx),
+                     hue_func(idx, 4 + idx),
+                     alpha]);
+    }
+    return colors;
+};
+
 function sorensen_index (a, b) {
     function bigrams (s) {
         var results = [];
@@ -351,7 +390,7 @@ function ParticleGraph (root, options) {
 			frame_rate_buffer.put(processing.__frameRate);
 			if (running == true) {
 				if (processing.frameCount > opts.frames_per_second * 5) {
-					if (frame_rate_buffer.mean() < opts.frames_per_second / 3) {
+					if (frame_rate_buffer.mean() < opts.frames_per_second) {
 						$(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
 					}
 				}
@@ -381,7 +420,7 @@ function ParticleGraph (root, options) {
                     continue;
                 var a_prtcl = edges[idx][0],
                     b_prtcl = edges[idx][1];
-                processing.strokeWeight(1.25/z_scale());
+                processing.strokeWeight(opts.node_size/2/z_scale());
                 processing.stroke.apply(processing, opts.edge_color);
                 processing.line(a_prtcl.position.x, a_prtcl.position.y,
                                 b_prtcl.position.x, b_prtcl.position.y);
@@ -410,7 +449,7 @@ function ParticleGraph (root, options) {
                     prtcl_idx = particle_selection.indexOf(b_prtcl),
                     color_idx = bounded(prtcl_idx, 0, opts.selection_colors.edge.length - 1),
                     color = opts.selection_colors.edge[color_idx];
-                processing.strokeWeight(1.25/z_scale());
+                processing.strokeWeight(opts.node_size/2/z_scale());
                 processing.stroke.apply(processing, color);
                 processing.fill.apply(processing, color);
                 processing.line(a_prtcl.position.x, a_prtcl.position.y,
@@ -464,10 +503,9 @@ function ParticleGraph (root, options) {
 			draw_zoom_control(processing);
             if (opts.debug == true) {
                 processing.fill.apply(processing, opts.label_color);
-                processing.text('Particles: ' + particles.length, 5, opts.height - 80);
                 processing.text('Frame rate:' + frame_rate_buffer.mean() + ' (Setting: ' + opts.frames_per_second + ')', 5, opts.height - 20);
-                processing.text('applyForces: ' + physics.applyForcesTimings.mean(), 5, opts.height - 60);
                 processing.text('add_link queue: ' + that.add_link.queue.backlog_size(), 5, opts.height - 40);
+                processing.text('Particles: ' + particles.length, 5, opts.height - 60);
             }
         };
         processing.setup = function(){

@@ -208,9 +208,14 @@ div#marquee span.number {
 }
 
 #low-frame-rate-warning {
-	color: #d00000;
-	font-weight: bold;
-	margin: 0 5px;
+    color: #d00000;
+    font-weight: bold;
+    width: 730px;
+    position: absolute;
+    top: 5px;
+    left: 150px;
+    margin: 0 5px;
+    opacity: 0.9;
 }
 
 #show-entity-btn {
@@ -237,6 +242,7 @@ div.node-name {
 }
 
 canvas#graph {
+    display: none;
     background: transparent;
     margin: 0;
     width: 940px;

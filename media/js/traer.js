@@ -440,8 +440,6 @@ function ParticleSystem(drag) {
 	this.forces = [];
     this.integrator = new RungeKuttaIntegrator(this);
 	this.hasDeadParticles = false;
-	this.timer = new Timer();
-	this.applyForcesTimings = new MeanBuffer(100);
 
 	var argc = arguments.length;
 	if (drag == null) {
@@ -509,8 +507,6 @@ ParticleSystem.prototype.clear = function() {
 	this.attractions.clear();
 };
 ParticleSystem.prototype.applyForces = function() {
-	this.timer.start();
-
 	var t, i;
 
 	for (i = 0; i < this.particles.length; i++) {
@@ -532,8 +528,6 @@ ParticleSystem.prototype.applyForces = function() {
 		t = this.forces[i];
 		t.apply();
 	}
-
-	this.applyForcesTimings.put(this.timer.stop());
 };
 ParticleSystem.prototype.clearForces = function() {
 	var i;
