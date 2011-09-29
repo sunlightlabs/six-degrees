@@ -2,14 +2,69 @@
 
 <html>
 	<head>
-test
 		{% block head %}
         <title>Six Degrees of Corporations</title>
 		{% endblock %}
 	</head>
-
+    <link rel="stylesheet" href="/media/css/duns.css" type="text/css" media="screen" />
 	<body>
-		{% block body %}
-		{% endblock %}
+	    <div class="sf_mini_header">
+        	<div class="sf_mini_header_nav_wrapper">
+        		<h1 id="sunFoundation"><a class="textReplace" href="http://www.sunlightfoundation.com">Sunlight Foundation</a></h1>
+        		<nav>
+            		<ul>
+            			<li class="about"> <a href="http://sunlightfoundation.com/about/">About</a>
+            			</li>
+            			<li class="blog"> <a href="http://sunlightfoundation.com/blog/">Blog</a>
+            			</li>
+            			<li class="projects"> <a href="http://sunlightfoundation.com/projects/">Projects</a>
+            			</li>
+            			<li class="contact"> <a href="http://sunlightfoundation.com/contact/">Contact</a>
+            			</li>
+            		</ul>
+            	</nav>
+        		<div class="clear"></div>
+        	</div>
+        </div>
+	    <header>
+	        <h1><a class="textReplace" href="/">Six Degrees of Corporations</a></h1>
+	        <nav>
+	            <ul>
+	                <li class="first"><a href="">About</a></li>
+	                <li><a href="/existing-identifiers">Existing Identifer Systems</a></li>
+	                <li><a href="/singapore-uen">Case Study</a></li>
+	                <li><a href="/resources">Resources</a></li>
+	            </ul>    
+	        </nav>   
+	        <div class="clear"></div> 
+	    </header>
+	    <div id="main">
+	        {% block body %}
+	        {% endblock %}
+	        <div class="clear"></div>
+	    </div>
+	    <footer>
+	        <img id="sunlightBadge" alt="A product of the Sunlight Foundation" src="/media/images/img_badge.jpg"/>
+	        <div id="footerText">
+	            <h3 class="textReplace">Like this project and want to discover others like it?</h3>
+	            <span class="tip">Join the Sunlight Foundation’s open government community to learn more</span>
+    	        <form action="/search/" method="get">
+                    <ul>
+                        <li>
+                            <input id="id_email" type="email" placeholder="Your email address" name="email">
+                        </li>  
+                        <li>
+                            <input id="id_email" type="email" placeholder="Your zip code" name="email">
+                        </li>
+                        <li>  
+                            <button id="submit_btn" type="submit">
+                                 <span>Submit</span>
+                            </button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+            <div class="clear"></div>
+	    </footer>    
 	</body>
 </html>
