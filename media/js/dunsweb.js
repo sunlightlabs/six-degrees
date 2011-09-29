@@ -61,6 +61,9 @@ function start_crawler (debug) {
     var seed = $("#company-name").val();
     if (seed == null)
         return;
+    seed = seed.trim();
+    if (seed == '')
+        return;
     seed = seed.toUpperCase();
 
     $("#results-graph-container *").remove();
@@ -146,8 +149,9 @@ $(document).ready(function(){
     $("#search_btn").click(function(event){
         event.preventDefault();
         start_crawler(!(query_params['debug'] == null));
-//        window.location = window.location + '#jump-to-graph';
-//        window.scrollTo(0, $("#jump-to-graph").offset()[1]);
+        var anchoroffset = $("#jump-to-graph").offset();
+        if (anchoroffset != null)
+            window.scrollTo(0, anchoroffset.top);
     });
     $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {

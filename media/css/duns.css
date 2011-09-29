@@ -208,6 +208,7 @@ div#marquee span.number {
 }
 
 #low-frame-rate-warning {
+    display: none;
     color: #d00000;
     font-weight: bold;
     width: 730px;
