@@ -297,7 +297,7 @@ function ParticleGraph (root, options) {
                                      near.y);
 
         var node = new ParticleGraphNode('name', name_value, duns_node, p);
-        add_edge(node.particle, grandparent_node.particle, node.depth,
+        add_edge(node.particle, grandparent_node.particle, node.parent_node.value, node.depth,
 				 sorensen_index(node.value, grandparent_node.value));
         particles.push(p);
         return node;
@@ -316,7 +316,7 @@ function ParticleGraph (root, options) {
         }
     }
 
-    var add_edge = function (a_prtcl, b_prtcl, multiplier, dampening) {
+    var add_edge = function (a_prtcl, b_prtcl, label, multiplier, dampening) {
 		dampening = Math.min(0.9, dampening);
         physics.makeSpring(a_prtcl, b_prtcl,
                            opts.edge_strength * multiplier, opts.edge_strength * multiplier,
@@ -327,7 +327,7 @@ function ParticleGraph (root, options) {
                                    -opts.spacer_strength * Math.min(multiplier, 3) * (1 - dampening),
                                    opts.node_size * 4);
         }
-        edges.push([a_prtcl, b_prtcl]);
+        edges.push([a_prtcl, b_prtcl, label]);
     };
 
     var reset = function () {
@@ -342,16 +342,6 @@ function ParticleGraph (root, options) {
             selection = selected_node.path_to_root()
                                      .filter(function(n){return n.type=='name';})
                                      .map(function(n){return n.particle;});
-            return selection;
-
-            for (var i = 0; i < selected_node.children.length; i++) {
-                var child = selected_node.children[i];
-                for (var j = 0; j < child.children.length; j++) {
-                    // We want the grandchild because we're showing every other node.
-                    var grandchild = child.children[j];
-                    selection.push(grandchild.particle);
-                }
-            }
         }
         return selection;
     };
@@ -446,14 +436,40 @@ function ParticleGraph (root, options) {
             for (var idx = 0; idx < edge_selection.length; idx++) {
                 var a_prtcl = edge_selection[idx][0],
                     b_prtcl = edge_selection[idx][1],
-                    prtcl_idx = particle_selection.indexOf(b_prtcl),
+                    prtcl_idx = particle_selection.indexOf(a_prtcl),
                     color_idx = bounded(prtcl_idx, 0, opts.selection_colors.edge.length - 1),
                     color = opts.selection_colors.edge[color_idx];
+                var dx = b_prtcl.position.x - a_prtcl.position.x,
+                    dy = b_prtcl.position.y - a_prtcl.position.y,
+                    mx = a_prtcl.position.x + (dx / 2),
+                    my = a_prtcl.position.y + (dy / 2);
+
                 processing.strokeWeight(opts.node_size/2/z_scale());
                 processing.stroke.apply(processing, color);
                 processing.fill.apply(processing, color);
                 processing.line(a_prtcl.position.x, a_prtcl.position.y,
                                 b_prtcl.position.x, b_prtcl.position.y);
+
+
+                label_text = edge_selection[idx][2];
+                label_text_width = parseInt(processing.textWidth(label_text));
+
+                processing.pushMatrix();
+                processing.translate(mx - (label_text_width / 3), my);
+                processing.scale(1/z_scale());
+
+                processing.strokeWeight(1/z_scale());
+                processing.stroke.apply(processing, opts.label_border_color);
+                processing.fill.apply(processing, opts.label_background);
+                processing.rect(-(opts.label_size / 2),
+                                -(opts.label_size * 1.1),
+                                label_text_width + opts.label_size,
+                                opts.label_size * 1.6);
+
+                processing.noStroke();
+                processing.fill.apply(processing, opts.label_color);
+                processing.text(label_text, 0, 0);
+                processing.popMatrix();
             }
 
             // Draw selected nodes
@@ -477,20 +493,18 @@ function ParticleGraph (root, options) {
 
                 // Draw selection labels
                 processing.pushMatrix();
-                processing.translate(cx + (opts.node_size * 5), cy);
+                processing.translate(cx + (opts.node_size * 5), cy + opts.node_size);
                 processing.scale(1/z_scale());
-                processing.translate(opts.label_size / 3,
-                                     opts.label_size / 3);
                 processing.textSize(opts.label_size);
 
                 label_text = find_node_by_particle(root_node, prtcl).value;
                 label_text_width = parseInt(processing.textWidth(label_text));
                 
-                processing.strokeWeight(2);
+                processing.strokeWeight(1);
                 processing.stroke.apply(processing, opts.label_border_color);
                 processing.fill.apply(processing, opts.label_background);
                 processing.rect(-(opts.label_size / 2), 
-                                -(opts.label_size * 1.1), 
+                                -(opts.label_size * 1.2), 
                                 label_text_width + opts.label_size, 
                                 opts.label_size * 1.6);
 
