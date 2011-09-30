@@ -458,7 +458,7 @@ function ParticleGraph (root, options) {
                 processing.translate(mx - (label_text_width / 3), my);
                 processing.scale(1/z_scale());
 
-                processing.strokeWeight(1/z_scale());
+                processing.strokeWeight(1);
                 processing.stroke.apply(processing, opts.label_border_color);
                 processing.fill.apply(processing, opts.label_background);
                 processing.rect(-(opts.label_size / 2),
