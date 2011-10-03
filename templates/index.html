@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load media %}
 
 {% block head_epilogue %}
-	<script type="text/javascript" src="media/js/jquery-1.5.1.min.js"></script>
-	<script type="text/javascript" src="media/js/jquery.mousewheel.min.js"></script>
-	<script type="text/javascript" src="media/js/traer.js"></script>
-	<script type="text/javascript" src="media/js/processing-1.3.0-api.js"></script>
-	<script type="text/javascript" src="media/js/extend.js"></script>
-	<script type="text/javascript" src="media/js/ratelimitedcall.js"></script>
-	<script type="text/javascript" src="media/js/meanbuffer.js"></script>
-	<script type="text/javascript" src="media/js/crawler.js"></script>
-	<script type="text/javascript" src="media/js/particlegraph.js"></script>
-	<script type="text/javascript" src="media/js/dunsweb.js"></script>
+	{% js "jquery-1.5.1.min.js" %}
+	{% js "jquery.mousewheel.min.js" %}
+	{% js "traer.js" %}
+	{% js "processing-1.3.0-api.js" %}
+	{% js "extend.js" %}
+	{% js "ratelimitedcall.js" %}
+	{% js "meanbuffer.js" %}
+	{% js "crawler.js" %}
+	{% js "particlegraph.js" %}
+	{% js "dunsweb.js" %}
 {% endblock %}
 
 {% block body %}

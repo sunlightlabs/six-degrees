@@ -15,10 +15,14 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', direct_to_template, {'template': 'index.html'}),
-    url(r'^existing-identifiers/$', direct_to_template, {'template': 'existing_identifiers.html'}),
-    url(r'^singapore-uen/$', direct_to_template, {'template': 'singapore_uen.html'}),
-    url(r'^resources/$', direct_to_template, {'template': 'resources.html'}),
+    url(r'^$', direct_to_template, {'template': 'index.html'}, 
+        name='index'),
+    url(r'^existing-identifiers/$', direct_to_template, {'template': 'existing_identifiers.html'}, 
+        name='existing-identifiers'),
+    url(r'^singapore-uen/$', direct_to_template, {'template': 'singapore_uen.html'}, 
+        name='singapore-uen'),
+    url(r'^resources/$', direct_to_template, {'template': 'resources.html'}, 
+        name='resources'),
     url(r'^contact', include('contactform.urls')),
     url(r'^duns[/]?', include('duns.urls')),
 )

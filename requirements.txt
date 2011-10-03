@@ -11,3 +11,5 @@ django-postmark
 django-extensions
 python-memcached
 django-debug-toolbar
+flup
+django-mediasync

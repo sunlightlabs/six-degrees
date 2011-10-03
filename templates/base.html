@@ -1,3 +1,4 @@
+{% load media %}
 <!DOCTYPE html>
 
 <html>
@@ -11,7 +12,7 @@
 		{% block head_epilogue %}
 		{% endblock %}
 	</head>
-    <link rel="stylesheet" href="media/css/duns.css" type="text/css" media="screen" />
+	{% css duns.css %}
 	<body>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
 	    <div class="sf_mini_header">
@@ -37,9 +38,9 @@
 	        <nav>
 	            <ul>
 	                <li class="first"><a href="">About</a></li>
-	                <li><a href="/existing-identifiers">Existing Identifer Systems</a></li>
-	                <li><a href="/singapore-uen">Case Study</a></li>
-	                <li><a href="/resources">Resources</a></li>
+					<li><a href="{% url existing-identifiers %}">Existing Identifer Systems</a></li>
+					<li><a href="{% url singapore-uen %}">Case Study</a></li>
+					<li><a href="{% url resources %}">Resources</a></li>
 	            </ul>    
 	        </nav>   
 	        <div class="clear"></div> 
