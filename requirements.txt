@@ -13,3 +13,4 @@ python-memcached
 django-debug-toolbar
 flup
 django-mediasync
+lxml
