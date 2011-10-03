@@ -26,3 +26,7 @@ urlpatterns = patterns('',
 urlpatterns += patterns('',
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )
+
+if hasattr(settings, 'URL_PREFIX') and settings.URL_PREFIX:
+    urlpatterns = patterns('', url('^%s/' % settings.URL_PREFIX, include(urlpatterns)))
+
