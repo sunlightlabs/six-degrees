@@ -60,6 +60,12 @@ function display_route_to_root (selected_node) {
     }
 }
 
+function scroll_graph_into_view () {
+    var anchoroffset = $("#jump-to-graph").offset();
+    if (anchoroffset != null)
+        window.scrollTo(0, anchoroffset.top);
+}
+
 function start_crawler (debug) {
     $("#low-frame-rate-warning").hide();
     var seed = $("#company-name").val();
@@ -70,9 +76,6 @@ function start_crawler (debug) {
         return;
     seed = seed.toUpperCase();
 
-    $("#results-graph-container *").remove();
-    $("#node-details *").remove();
-    $("#overlay").show("Appear");
     var canvas = document.getElementById("graph");
     var crawler = new Crawler({delay: 250});
     var graph_options = $.extend(true, {}, GraphOptions);
@@ -127,8 +130,7 @@ function start_crawler (debug) {
    });
 
     crawler.start(seed, 'name');
-    $("#cancel-search-btn").show();
-    $("#graph:hidden").fadeIn(1200);
+    $("#viz-container:hidden").fadeIn(800);
 }
 
 $(document).ready(function(){
@@ -153,13 +155,12 @@ $(document).ready(function(){
     $("#search_btn").click(function(event){
         event.preventDefault();
         start_crawler(!(query_params['debug'] == null));
-        var anchoroffset = $("#jump-to-graph").offset();
-        if (anchoroffset != null)
-            window.scrollTo(0, anchoroffset.top);
+        scroll_graph_into_view();
     });
     $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {
             start_crawler(!(query_params['debug'] == null));
+            scroll_graph_into_view();
         }
         event.preventDefault();
     });

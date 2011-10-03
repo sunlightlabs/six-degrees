@@ -177,6 +177,7 @@ h3 { font-size: 120%;}
 .copy li { list-style-type: disc; margin-left: 35px; margin-bottom: 5px;}
 .copy ul { margin-bottom: 25px;}
 
+#viz-container { display: none;}
 #viz-explain { margin-top: 60px; font-size: 95%;}
 
 footer { background: url(../images/divider_horiz.png) left top repeat-x; margin: 40px auto 60px; padding-top: 40px;}
@@ -249,7 +250,6 @@ div.node-name {
 }
 
 canvas#graph {
-    display: none;
     background: transparent;
     margin: 0;
     width: 940px;
