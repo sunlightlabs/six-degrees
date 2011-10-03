@@ -55,13 +55,13 @@ function Crawler (options) {
     };
 
     var search_by_duns = function (duns) {
-        $.ajax("/duns/" + duns,
+        $.ajax("duns/" + duns,
                 { data: "q=",
                   success: recv_names });
     };
 
     var search_by_name = function (name) {
-        $.ajax("/duns/" + encodeURIComponent(name),
+        $.ajax("duns/" + encodeURIComponent(name),
                 { data: "q=",
                   success: recv_duns });
     };

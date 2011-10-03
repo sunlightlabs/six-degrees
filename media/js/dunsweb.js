@@ -27,7 +27,7 @@ function display_node_details (data, textStatus, jqXHR) {
 
 function retrieve_node_details (node) {
     $("#node-details-container *").remove();
-    $.ajax('/duns/details/' + encodeURIComponent(node.value) + '.html', {
+    $.ajax('duns/details/' + encodeURIComponent(node.value) + '.html', {
            data: 'q=',
            success: display_node_details
            });
