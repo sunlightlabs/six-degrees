@@ -34,7 +34,7 @@
         	</div>
         </div>
 	    <header>
-	        <h1><a class="textReplace" href="/">Six Degrees of Corporations</a></h1>
+		<h1><a class="textReplace" href="{% url index %}">Six Degrees of Corporations</a></h1>
 	        <nav>
 	            <ul>
 	                <li id="about" class="first"><a href="">About</a></li>
@@ -51,7 +51,7 @@
 	        <div class="clear"></div>
 	    </div>
 	    <footer>
-	        <img id="sunlightBadge" alt="A product of the Sunlight Foundation" src="media/images/img_badge.jpg"/>
+			<img id="sunlightBadge" alt="A product of the Sunlight Foundation" src="{% media_url "images/img_badge.jpg" %}"/>
 	        <div id="footerText">
 	            <h3 class="textReplace">Like this project and want to discover others like it?</h3>
 	            <span class="tip">Join the Sunlight Foundation’s open government community to learn more</span>
