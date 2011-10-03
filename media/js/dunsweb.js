@@ -19,6 +19,10 @@ var GraphOptions = {
     }
 };
 
+$().ready( function() {
+    $( "input, textarea" ).placehold( );
+});
+
 function display_node_details (data, textStatus, jqXHR) {
     var snippet = $(data);
     $("#node-details-container *").remove();

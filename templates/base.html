@@ -13,7 +13,7 @@
 		{% endblock %}
 	</head>
 	{% css duns.css %}
-	<body>
+	<body  class="{% block bodyclass %}home{% endblock %}">
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
 	    <div class="sf_mini_header">
         	<div class="sf_mini_header_nav_wrapper">
@@ -37,10 +37,10 @@
 	        <h1><a class="textReplace" href="/">Six Degrees of Corporations</a></h1>
 	        <nav>
 	            <ul>
-	                <li class="first"><a href="">About</a></li>
-					<li><a href="{% url existing-identifiers %}">Existing Identifer Systems</a></li>
-					<li><a href="{% url singapore-uen %}">Case Study</a></li>
-					<li><a href="{% url resources %}">Resources</a></li>
+	                <li id="about" class="first"><a href="">About</a></li>
+					<li id="identifier"><a href="{% url existing-identifiers %}">Existing Identifer Systems</a></li>
+					<li id="caseStudy"><a href="{% url singapore-uen %}">Case Study</a></li>
+					<li id="resources"><a href="{% url resources %}">Resources</a></li>
 	            </ul>    
 	        </nav>   
 	        <div class="clear"></div> 
@@ -61,7 +61,7 @@
                             <input id="id_email" type="email" placeholder="Your email address" name="email">
                         </li>  
                         <li>
-                            <input id="id_email" type="email" placeholder="Your zip code" name="email">
+                            <input id="id_zip" type="zip" placeholder="Your zip code" name="email">
                         </li>
                         <li>  
                             <button id="submit_btn" type="submit">

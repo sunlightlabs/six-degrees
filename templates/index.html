@@ -4,6 +4,7 @@
 {% block head_epilogue %}
 	{% js "jquery-1.5.1.min.js" %}
 	{% js "jquery.mousewheel.min.js" %}
+	{% js "jquery-placehold.min.js" %}
 	{% js "traer.js" %}
 	{% js "processing-1.3.0-api.js" %}
 	{% js "extend.js" %}
@@ -37,7 +38,7 @@
 				</canvas>
 				<div id="low-frame-rate-warning" class="companyContent clear">The data may contain more connections than can be shown here. However your computer is having trouble drawing the graph, so the search has been stopped. It may run better if you close other applications.</div>
 				</div>
-				<p id="viz-explain" class="clear">The graph above is created by searching the <a href="http://www.usaspending.gov">USASpending.gov</a> database for contracts and grants that associate a name with a DUNS number or vice versa, repeating until it fails to find any new associations. Inaccuracies may result from name variations, a corporate restructing not reflected in the D&amp;B data, or from simple mis-use of DUNS numbers. Contract and grant details are available from USASpending.gov.</p>
+				<p id="viz-explain" class="clear tip">The graph above is created by searching the <a href="http://www.usaspending.gov">USASpending.gov</a> database for contracts and grants that associate a name with a DUNS number or vice versa, repeating until it fails to find any new associations. Inaccuracies may result from name variations, a corporate restructing not reflected in the D&amp;B data, or from simple mis-use of DUNS numbers. Contract and grant details are available from USASpending.gov.</p>
         </div>
     </div>
     <img id="imgHome" alt="examining a finger print" src="media/images/img_fingerprint.jpg"/>
