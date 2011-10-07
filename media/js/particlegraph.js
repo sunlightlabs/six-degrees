@@ -165,10 +165,6 @@ function ParticleGraph (root, options) {
                 edge: null
             },
         background: [99, 99, 99, 255],
-		zoom_ctl_x: 5,
-		zoom_ctl_y: 5,
-		zoom_ctl_width: 165,
-		zoom_ctl_height: 25,
         debug: false
     };
     var opts = $.extend(true, {}, defaults);
@@ -192,6 +188,15 @@ function ParticleGraph (root, options) {
     var drag_adjust = new Vector(0, 0);
     var zoom_level = null;
 
+    var zoom_width = (opts.width / 2) - (opts.label_size * 2),
+        zoom_left = opts.width / 2,
+        zoom_right = zoom_left + zoom_width,
+        zoom_height = opts.label_size * 1.66,
+        zoom_top = opts.height - zoom_height,
+        zoom_bottom = opts.height,
+        zoom_mid = zoom_bottom - (zoom_height / 2),
+        baseline = zoom_top + zoom_height * 0.65;
+
     var z_scale = function () {
         if (zoom_level == null) {
             return centroid.scale();
@@ -200,9 +205,13 @@ function ParticleGraph (root, options) {
         }
     };
 
+    var in_zoom_control = function (mx, my) {
+		return ((mx >= zoom_left) && (my >= zoom_top) && (mx <= zoom_right) && (my <= zoom_bottom));
+    };
+
 	var handle_zoom_control_click = function (mx, my) {
-		if ((mx >= opts.zoom_ctl_x) && (my >= opts.zoom_ctl_y) && (mx <= opts.zoom_ctl_x + opts.zoom_ctl_width) && (my <= opts.zoom_ctl_y + opts.zoom_ctl_height)) {
-			var zoom_pct = (mx - opts.zoom_ctl_x) / opts.zoom_ctl_width;
+        if (in_zoom_control(mx, my)) {
+			var zoom_pct = (mx - zoom_left) / zoom_width;
 			zoom_level = bounded(opts.zoom_min + (opts.zoom_max - opts.zoom_min) * zoom_pct, 
 					             opts.zoom_min, opts.zoom_max);
 			return true;
@@ -213,16 +222,29 @@ function ParticleGraph (root, options) {
 
 	var draw_zoom_control = function (processing) {
 		processing.resetMatrix();
-		processing.fill(0xf0, 0xf0, 0xf0, 0x80);
-		processing.stroke(0xd0, 0xd0, 0xd0, 0xff);
-		processing.strokeWeight(3);
-		processing.triangle(opts.zoom_ctl_x, opts.zoom_ctl_y + opts.zoom_ctl_height,
-							opts.zoom_ctl_x + opts.zoom_ctl_width, opts.zoom_ctl_y,
-							opts.zoom_ctl_x + opts.zoom_ctl_width, opts.zoom_ctl_y + opts.zoom_ctl_height);
+        processing.fill(137, 130, 126, 255);
+        processing.rect(0, opts.height - opts.label_size * 2, opts.width, opts.label_size * 2);
+
+        processing.fill(250, 250, 250, 255);
+        processing.stroke(250, 250, 250, 255);
+        processing.text('Use your scroll wheel to zoom, drag & drop to pan around', opts.label_size, baseline);
+        processing.strokeWeight(1);
+        processing.fill(250, 250, 250, 255);
+        processing.rect(zoom_left, zoom_mid - 4, zoom_width, 4);
+        processing.rectMode(processing.RADIUS);
+
+        processing.fill(250, 250, 250, 255);
+        processing.noStroke();
+        processing.rect(zoom_left - opts.label_size, zoom_mid - 2, opts.label_size * 0.5, opts.label_size * 0.1);
+        processing.rect(zoom_right + opts.label_size, zoom_mid - 2, opts.label_size * 0.5, opts.label_size * 0.1);
+        processing.rect(zoom_right + opts.label_size, zoom_mid - 2, opts.label_size * 0.1, opts.label_size * 0.5);
+
 		var zoom_pct = (z_scale() - opts.zoom_min) / (opts.zoom_max - opts.zoom_min),
-			zoom_pct_x_offset = Math.round(opts.zoom_ctl_width * zoom_pct);
-		processing.line(opts.zoom_ctl_x + zoom_pct_x_offset, opts.zoom_ctl_height - (opts.zoom_ctl_height * zoom_pct),
-						opts.zoom_ctl_x + zoom_pct_x_offset, opts.zoom_ctl_y + opts.zoom_ctl_height);
+			zoom_x_offset = Math.round(zoom_width * zoom_pct);
+        processing.noStroke();
+        processing.fill(250, 250, 250, 255);
+        processing.rect(zoom_left + zoom_x_offset, zoom_mid - 2, opts.label_size / 2, zoom_height * 0.4);
+        processing.rectMode(processing.CORNER);
 	}
 
     this.offset_for_position = function (x, y) {
@@ -238,14 +260,23 @@ function ParticleGraph (root, options) {
     };
 
     this.node_at = function (x, y) {
-        var position = that.position_for_offset(x, y);
+        var position = that.position_for_offset(x, y),
+            closest = null,
+            closest_distance = opts.node_size * 6;
         for (var idx = 0; idx < particles.length; idx++) {
             var distance = position.distanceTo(particles[idx].position);
-            if (distance <= opts.node_size * 5 * z_scale()) {
-                return find_node_by_particle(root_node, particles[idx]);
+            if (distance <= opts.node_size * 5) {
+                if (distance < closest_distance) {
+                    closest = particles[idx];
+                    closest_distance = distance;
+                }
             }
         }
-        return null;
+        if (closest == null) {
+            return null;
+        } else {
+            return find_node_by_particle(root_node, closest);
+        }
     };
 
     this.add_link = function (a, b) {
@@ -570,18 +601,22 @@ function ParticleGraph (root, options) {
         var drag_x = null,
             drag_y = null;
         processing.mousePressed = function(){
-            drag_x = processing.mouseX;
-            drag_y = processing.mouseY;
+            if (! in_zoom_control(processing.mouseX, processing.mouseY)) {
+                drag_x = processing.mouseX;
+                drag_y = processing.mouseY;
+            }
         };
         processing.mouseReleased = function(){
             drag_x = null;
             drag_y = null;
         };
         processing.mouseDragged = function(){
-            drag_adjust.add(processing.mouseX - drag_x,
-                            processing.mouseY - drag_y);
-            drag_x = processing.mouseX;
-            drag_y = processing.mouseY;
+            if ((drag_x != null) && (drag_y != null)) {
+                drag_adjust.add(processing.mouseX - drag_x,
+                                processing.mouseY - drag_y);
+                drag_x = processing.mouseX;
+                drag_y = processing.mouseY;
+            }
         };
     };
 

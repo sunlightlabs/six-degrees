@@ -227,7 +227,7 @@ div#marquee span.number {
     width: 730px;
     position: absolute;
     top: 5px;
-    left: 150px;
+    left: 5px;
     margin: 0 5px;
     opacity: 0.9;
 }
