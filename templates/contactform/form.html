@@ -1,25 +1,36 @@
 {% extends "base.html" %}
+
+{% block bodyclass %}contact{% endblock %}
+
 {% block body %}
 
-<form action="{% url contactform %}" method="POST">
+<h2 class="withTip">Contact Us</h2>
+<p>Have questions or concerns, let us know. We'd love to hear from you.</p>
+
+<form id="contactForm" action="{% url contactform %}" method="POST">
+    <ul>
 	{% csrf_token %}
 
-	<p id="name-fld-cont">
-		<label class="contact" for="id_name" value="Name">Name</label>
-		{{ form.name }}
-	</p>
-	<p id="email-fld-cont">
-		<label class="contact" for="id_email" value="Email">Email</label>
-		{{ form.email }}
-	</p>
-	<p id="body-fld-cont">
-		<label class="contact" for="id_body" value="Message:">Message:</label>
-		<p>
-		{{ form.body }}
-		</p>
-	</p>
-
-	<input type="submit" value="Send">
+    	<li id="name-fld-cont">
+    		<label class="contact" for="id_name" value="Name">Name</label>
+    		{{ form.name }}
+    	</li>
+    	<li id="email-fld-cont">
+    		<label class="contact" for="id_email" value="Email">Email</label>
+    		{{ form.email }}
+    	</li>
+    	<li id="body-fld-cont">
+    		<label class="contact" for="id_body" value="Message">Message</label>
+    		<p>
+    		{{ form.body }}
+    		</p>
+    	</li>
+        <li>
+            <button class="sendBtn" type="submit" value="Send">>
+                <span>Send</span>
+            </button>
+    	</li>
+	</ul>
 </form>
 
 {% endblock %}

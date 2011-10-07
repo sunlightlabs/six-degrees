@@ -141,7 +141,7 @@ header h1 a { width: 258px; height: 95px; background: url(../images/logo.png) to
 
 header nav { background: url(../images/bg_nav.png) center top no-repeat; height: 86px;}
 header nav li { float: left; padding: 0 25px 15px; background: url(../images/nav_divider.png) left top no-repeat; margin-top: 18px; text-align: center; display: block;}
-header nav li:hover a, .about header nav #about a, .identifiers header nav #identifer a, .caseStudy header nav #caseStudy a, .resources header nav #resources a { background: url(../images/bg_navCircle2.jpg) left -12px no-repeat; color: #7d6e74;}
+header nav li:hover a, .about header nav #about a, .identifiers header nav #identifer a, .caseStudy header nav #caseStudy a, .resources header nav #resources a, .contact header nav #contact a { background: url(../images/bg_navCircle2.jpg) left -12px no-repeat; color: #7d6e74;}
 header nav li a { background: url(../images/bg_navCircle2.jpg) left 4px no-repeat; font-size: 120%; text-decoration: none; padding-left: 20px;}
 header nav li.first { background: none;}
 
@@ -156,8 +156,10 @@ header nav li.first { background: none;}
 #search_btn:hover { background: url(../images/btn_search.jpg) bottom left no-repeat; }
 #submit_btn { background: url(../images/btn_submit.jpg) top left no-repeat; width: 113px; height: 30px;}
 #submit_btn:hover { background: url(../images/btn_submit.jpg) bottom left no-repeat; }
+.sendBtn { background: url(../images/btn_send.jpg) top left no-repeat; width: 113px; height: 35px; margin-left: 90px;}
+.sendBtn:hover { background: url(../images/btn_send.jpg) bottom left no-repeat; }
 
-input { color: #a09b97; border: 1px solid #d3d1c7; -moz-border-radius: 8px; -webkit-border-radius: 8px; padding: 10px 12px; float: left; margin-right: 15px; width: 300px; background: #fff url(../images/input_gradient.jpg) bottom left repeat-x;}
+input, textarea { color: #a09b97; border: 1px solid #d3d1c7; -moz-border-radius: 8px; -webkit-border-radius: 8px; padding: 10px 12px; float: left; margin-right: 15px; width: 300px; background: #fff url(../images/input_gradient.jpg) bottom left repeat-x;}
 
 #ribbon { background: url(../images/bg_ribbontitle.jpg) top left no-repeat; height: 32px; color: #fff; font-family: Georgia, "Times New Roman", Times, serif; font-weight: normal; padding: 5px 0 0 30px;}
 .companyContent { padding-left: 30px;}
@@ -180,6 +182,8 @@ h3 { font-size: 120%;}
 #viz-container { display: none;}
 #viz-explain { margin-top: 60px; font-size: 95%;}
 
+.withTip { margin-bottom: 10px;}
+
 footer { background: url(../images/divider_horiz.png) left top repeat-x; margin: 40px auto 60px; padding-top: 40px;}
 footer h3 { background: url(../images/footer_title.jpg) top left no-repeat; margin-bottom: 3px;}
 
@@ -192,7 +196,9 @@ footer input { padding: 8px 10px;}
 #id_email { width: 200px;}
 #id_zip { width: 130px;}
 
-
+#contactForm li { margin-bottom: 15px;}
+#contactForm label { float: left; width: 90px;}
+#contactForm input, #contactForm textarea { float: none; width: 300px;}
 
 div#marquee {
     width: 100%;
@@ -221,7 +227,7 @@ div#marquee span.number {
     width: 730px;
     position: absolute;
     top: 5px;
-    left: 150px;
+    left: 5px;
     margin: 0 5px;
     opacity: 0.9;
 }
