@@ -146,7 +146,7 @@ header nav li a { background: url(../images/bg_navCircle2.jpg) left 4px no-repea
 header nav li.first { background: none;}
 
 .textReplace { text-indent: -9999em; display: block;}
-.tip { font-family: Georgia, "Times New Roman", Times, serif; font-style: oblique; color: #a09b97; line-height: 17px; margin-bottom: 25px;}
+.tip { font-family: Georgia, "Times New Roman", Times, serif; font-style: oblique; color: #6A6562; line-height: 17px; margin-bottom: 25px;}
 
 #featureArea { background: url(../images/divider_horiz.png) left bottom repeat-x; padding-left: 65px; margin-bottom: 40px; padding-bottom: 20px; margin-top: 5px;}
 #featureArea h2 { width: 302px; height: 36px; background: url(../images/feature_title.png) top left no-repeat; margin-bottom: 10px;}
@@ -180,7 +180,7 @@ h3 { font-size: 120%;}
 .copy ul { margin-bottom: 25px;}
 
 #viz-container { display: none;}
-#viz-explain { margin-top: 60px; font-size: 95%;}
+#viz-explain { }
 
 .withTip { margin-bottom: 10px;}
 
