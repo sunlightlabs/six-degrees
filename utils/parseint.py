@@ -1,5 +1,8 @@
 def parseint(s, default=None):
     try:
-        return int(s.strip())
+        if s is None:
+            return default
+        else:
+            return int(s.strip())
     except ValueError:
         return default
