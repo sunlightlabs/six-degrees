@@ -1,0 +1,501 @@
+Wal-Mart Stores
+Exxon Mobil
+Chevron
+ConocoPhillips
+Fannie Mae
+General Electric
+Berkshire Hathaway
+General Motors
+Bank of America Corp.
+Ford Motor
+Hewlett-Packard
+AT&T
+J.P. Morgan Chase & Co.
+Citigroup
+McKesson
+Verizon Communications
+American International Group
+International Business Machines
+IBM
+Cardinal Health
+Freddie Mac
+CVS Caremark
+UnitedHealth Group
+Wells Fargo
+Valero Energy
+Kroger
+Procter & Gamble
+AmerisourceBergen
+Costco Wholesale
+Marathon Oil
+Home Depot
+Pfizer
+Walgreen
+Target
+Medco Health Solutions
+Apple Computer
+Boeing
+State Farm Insurance Cos.
+Microsoft
+Archer Daniels Midland
+Johnson & Johnson
+Dell
+WellPoint
+PepsiCo
+United Technologies
+Dow Chemical
+MetLife
+Best Buy
+United Parcel Service
+Kraft Foods
+Lowe's
+INTL FCStone
+Lockheed Martin
+Merck
+Goldman Sachs Group
+Express Scripts
+Intel
+Sears Holdings
+Caterpillar
+Chrysler Group
+Safeway
+Supervalu
+Cisco Systems
+Morgan Stanley
+Prudential Financial
+Walt Disney
+Comcast
+Sysco
+Sunoco
+Abbott Laboratories
+Coca-Cola
+New York Life Insurance
+Northrop Grumman
+FedEx
+Hess
+Ingram Micro
+Johnson Controls
+Aetna
+Amazon.com
+Humana
+Enterprise Products Partners
+Honeywell International
+Liberty Mutual Insurance Group
+News Corp.
+DuPont
+Sprint Nextel
+General Dynamics
+TIAA-CREF
+Delta Air Lines
+Allstate
+HCA Holdings
+American Express
+Google
+Tyson Foods
+Philip Morris International
+Time Warner
+Oracle
+3M
+Deere
+Plains All American Pipeline
+Rite Aid
+Massachusetts Mutual Life Insurance
+Publix Super Markets
+CHS
+Raytheon
+International Paper
+Travelers Cos.
+Macy's
+Staples
+Tech Data
+DirecTV
+McDonald's
+Northwestern Mutual
+Murphy Oil
+United Continental Holdings
+Eli Lilly
+Motorola Solutions
+Hartford Financial Services
+AMR
+TJX
+Emerson Electric
+Xerox
+Cigna
+Alcoa
+Fluor
+Aflac
+U.S. Bancorp
+Nationwide
+Tesoro
+Occidental Petroleum
+Kimberly-Clark
+Bristol-Myers Squibb
+Avnet
+World Fuel Services
+Capital One Financial
+Nike
+Freeport-McMoRan Copper & Gold
+Time Warner Cable
+Manpower
+Goodyear Tire & Rubber
+Arrow Electronics
+Exelon
+Kohl's
+Whirlpool
+Halliburton
+United Services Automobile Assn.
+J.C. Penney
+Southern
+United States Steel
+Ally Financial
+AES
+PNC Financial Services Group
+EMC
+Union Pacific
+Altria Group
+Computer Sciences
+Illinois Tool Works
+Nucor
+Medtronic
+L-3 Communications
+Colgate-Palmolive
+NextEra Energy
+Dominion Resources
+Amgen
+Progressive
+Bank of New York Mellon Corp.
+General Mills
+Gap
+Loews
+American Electric Power
+Baker Hughes
+TRW Automotive Holdings
+Constellation Energy
+Duke Energy
+CBS
+Texas Instruments
+Toys "R" Us
+PG&E Corp.
+Eaton
+Health Net
+Viacom
+PPG Industries
+Jabil Circuit
+FirstEnergy
+Consolidated Edison
+Chubb
+Cummins
+Danaher
+Dollar General
+Oneok
+Community Health Systems
+Sara Lee
+Baxter International
+DISH Network
+Aramark
+Omnicom Group
+Waste Management
+AutoNation
+Edison International
+Kellogg
+ConAgra Foods
+Public Service Enterprise Group
+National Oilwell Varco
+Dean Foods
+Navistar International
+Southwest Airlines
+Apache
+Lear
+US Airways Group
+Qwest Communications
+Marriott International
+Office Depot
+Coventry Health Care
+Entergy
+Yum Brands
+Genuine Parts
+Smithfield Foods
+ITT
+Land O'Lakes
+SAIC
+BB&T Corp.
+BJ's Wholesale Club
+Qualcomm
+Anadarko Petroleum
+Liberty Media
+Marsh & McLennan
+Avon Products
+Thermo Fisher Scientific
+Penske Automotive Group
+Starbucks
+CSX
+Devon Energy
+H.J. Heinz
+Textron
+Monsanto
+Lincoln National
+First Data
+Xcel Energy
+Paccar
+Unum Group
+Progress Energy
+Praxair
+KBR
+Genworth Financial
+SunTrust Banks
+Guardian Life Ins. Co. of America
+Ameriprise Financial
+R.R. Donnelley & Sons
+Parker Hannifin
+Peter Kiewit Sons'
+Jacobs Engineering Group
+Western Digital
+Oshkosh
+State Street Corp.
+Nordstrom
+Liberty Global
+KKR
+Williams
+Limited Brands
+Applied Materials
+Newmont Mining
+Norfolk Southern
+GameStop
+Chesapeake Energy
+Huntsman
+C.H. Robinson Worldwide
+Tenet Healthcare
+URS
+Principal Financial
+eBay
+Icahn Enterprises
+Air Products & Chemicals
+Ashland
+Whole Foods Market
+Sempra Energy
+Automatic Data Processing
+NRG Energy
+Caesars Entertainment
+Great Atlantic & Pacific Tea
+CenterPoint Energy
+PPL
+Synnex
+BlackRock
+DTE Energy
+Reynolds American
+Assurant
+Aon
+Micron Technology
+Stanley Black & Decker
+Holly
+Reinsurance Group of America
+Discover Financial Services
+Energy Future Holdings
+Regions Financial
+Kinder Morgan
+Owens & Minor
+Republic Services
+Visa
+Western Refining
+Gilead Sciences
+Ball
+Crown Holdings
+Family Dollar Stores
+Ross Stores
+Bed Bath & Beyond
+Boston Scientific
+Global Partners
+Estée Lauder
+Sherwin-Williams
+Enbridge Energy Partners
+VF
+CarMax
+Campbell Soup
+Ameren
+Masco
+Hertz Global Holdings
+Becton Dickinson
+Henry Schein
+Thrivent Financial for Lutherans
+Visteon
+Quest Diagnostics
+Cablevision Systems
+AutoZone
+Stryker
+Winn-Dixie Stores
+Hormel Foods
+Fifth Third Bancorp
+Eastman Kodak
+W.W. Grainger
+Autoliv
+OfficeMax
+Dover
+Darden Restaurants
+Charter Communications
+CenturyLink
+Pepco Holdings
+Shaw Group
+Goodrich
+Peabody Energy
+Sonic Automotive
+AGCO
+Dole Food
+Las Vegas Sands
+Broadcom
+SLM
+Owens-Illinois
+Mosaic
+Coca-Cola Enterprises
+Eastman Chemical
+Calpine
+Corning
+Energy Transfer Equity
+Fortune Brands
+AECOM Technology
+Weyerhaeuser
+Interpublic Group
+Avery Dennison
+Advanced Micro Devices
+American Family Insurance Group
+DaVita
+CMS Energy
+Commercial Metals
+NiSource
+Pantry
+CIT Group
+Yahoo
+Sanmina-SCI
+Reliance Steel & Aluminum
+Steel Dynamics
+Smurfit-Stone Container
+Dillard's
+Omnicare
+McGraw-Hill
+MeadWestvaco
+Virgin Media
+Cameron International
+Dana Holding
+EOG Resources
+Ecolab
+Jarden
+MGM Resorts International
+Spectrum Group International
+Symantec
+AK Steel Holding
+Expeditors International of Washington
+TravelCenters of America
+Tenneco
+Advance Auto Parts
+Celanese
+Frontier Oil
+Dollar Tree
+CC Media Holdings
+Mattel
+Franklin Resources
+Domtar
+Barnes & Noble
+Amerigroup
+Newell Rubbermaid
+Fidelity National Financial
+Mutual of Omaha Insurance
+PetSmart
+Universal American
+Hershey
+BorgWarner
+Dr Pepper Snapple Group
+Pacific Life
+NII Holdings
+UGI
+Universal Health Services
+Precision Castparts
+MasterCard
+Clorox
+Core-Mark Holding
+Group 1 Automotive
+Anixter International
+Gannett
+Targa Resources
+KeyCorp
+Mylan
+Agilent Technologies
+WellCare Health Plans
+Pitney Bowes
+CH2M Hill
+Lubrizol
+O'Reilly Automotive
+Auto-Owners Insurance
+Fidelity National Information Services
+Mohawk Industries
+Consol Energy
+Harris
+Integrys Energy Group
+Western Union
+Avis Budget Group
+Momentive Specialty Chemicals
+SunGard Data Systems
+Health Management Associates
+St. Jude Medical
+Ryder System
+Booz Allen Hamilton Holding
+Emcor Group
+CB Richard Ellis Group
+Starwood Hotels & Resorts
+Spectra Energy
+Wesco International
+Live Nation Entertainment
+Avaya
+Foot Locker
+Laboratory Corp. of America
+Owens Corning
+Nash-Finch
+Telephone & Data Systems
+Polo Ralph Lauren
+Apollo Group
+Big Lots
+Con-way
+Kelly Services
+Western & Southern Financial Group
+Allergan
+Harley-Davidson
+Northeast Utilities
+SPX
+Erie Insurance Group
+Bemis
+Meritor
+Dick's Sporting Goods
+General Cable
+Rockwell Automation
+United Stationers
+SanDisk
+NCR
+Washington Post
+Insight Enterprises
+Alliant Techsystems
+Atmos Energy
+AbitibiBowater
+W.R. Berkley
+Biogen Idec
+Cliffs Natural Resources
+Rockwell Collins
+Phillips-Van Heusen
+Graybar Electric
+El Paso
+J.M. Smucker
+Scana
+Cognizant Technology Solutions
+Terex
+PulteGroup
+Genzyme
+YRC Worldwide
+American Financial Group
+Sealed Air
+Charles Schwab
+RadioShack
+Centene
+Host Hotels & Resorts
+NYSE Euronext
+Levi Strauss
+NuStar Energy
+Ruddick
+D.R. Horton
+Seaboard

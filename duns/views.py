@@ -250,7 +250,16 @@ def node_details(contracts, grants):
 def autocomplete(request):
     term = request.GET.get('term')
     if term is not None:
-        names = [n.name for n in Name.objects.filter(name__istartswith=request.GET.get('term'))]
+        term = term.upper()
+        names = [n.name.upper() for n in Name.objects.filter(autocomplete_candidate=True,
+                                                             name__istartswith=term)]
+        if len(names) == 0:
+            names = [n.name.upper() for n in Name.objects.filter(autocomplete_candidate=True,
+                                                                 name__icontains=term)]
+        names.sort(key=lambda n: n.index(term))
+        names.sort(key=lambda n: len(n))
+        if len(names) > 18:
+            names = names[0:18]
     else:
         names = []
     return HttpResponse(json.dumps(names), 'application/json')

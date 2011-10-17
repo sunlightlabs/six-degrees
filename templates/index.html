@@ -3,6 +3,7 @@
 
 {% block head_epilogue %}
 	{% js "jquery-1.5.1.min.js" %}
+    {% js "jquery-ui-1.8.16.custom.min.js" %}
 	{% js "jquery.mousewheel.min.js" %}
 	{% js "jquery-placehold.min.js" %}
 	{% js "traer.js" %}
@@ -33,6 +34,8 @@
 						 <span>Search</span>
 					</button>
 				</form>
+
+				<img id="example-graph" src="media/images/example-graph.jpg">
 
 				<div id="viz-container" style="position: relative;">
 					<canvas id="graph">

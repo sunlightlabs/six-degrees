@@ -130,6 +130,7 @@ function start_crawler (debug) {
    });
 
     crawler.start(seed, 'name');
+    $("#example-graph").hide();
     $("#viz-container:hidden").fadeIn(800);
 }
 
@@ -164,6 +165,24 @@ $(document).ready(function(){
         }
         event.preventDefault();
     });
+    $("#company-name").autocomplete({source:
+        function (request, callback) {
+            try {
+                if (request.term.length >= 3) {
+                    $.ajax('duns/autocomplete', {
+                           data: request,
+                           success: function (data, textStatus, jqXHR) {
+                               callback(data);
+                           }});
+                } else {
+                    callback([]);
+                }
+            } catch (err) {
+                callback([]);
+            }
+        }
+    });
+
 
     if(typeof String.prototype.trim !== 'function') {
         String.prototype.trim = function() {

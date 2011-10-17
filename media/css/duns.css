@@ -255,6 +255,12 @@ div.node-name {
     padding: 0.7em 0 0 1em;
 }
 
+#example-graph {
+    width: 940px;
+	height: 600px;
+	margin: 0;
+}
+
 canvas#graph {
     background: transparent;
     margin: 0;
