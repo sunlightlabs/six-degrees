@@ -7,7 +7,7 @@ gunicorn==0.12.0
 PyGreSQL==4.0
 psycopg2
 GenericCache
-django-postmark
+-e git://github.com/dvogel/django-postmark.git#egg=dvogel-django-postmark-dev
 django-extensions
 python-memcached
 django-debug-toolbar
