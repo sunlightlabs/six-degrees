@@ -195,7 +195,6 @@ def search_by_duns(duns_number):
 def lookup_by_name(request, entity_name):
     cache_key = quote(entity_name.upper())
     duns_list = cache.get(cache_key)
-    print "%s cache %s" % (cache_key, "hit" if duns_list else "miss")
     if duns_list is None:
         duns_list = search_by_name(entity_name)
         if duns_list is None:
@@ -211,7 +210,6 @@ def lookup_by_name(request, entity_name):
 def lookup_by_duns_number(request, duns_number):
     cache_key = quote(duns_number)
     name_list = cache.get(cache_key)
-    print "%s cache %s" % (cache_key, "hit" if name_list else "miss")
     if name_list is None:
         name_list = search_by_duns(duns_number)
         if name_list is None:
