@@ -4,15 +4,13 @@
  *
  * @author Jeffrey Traer Bernstein <jeff TA traer TOD cc> (original Java library)
  * @author Adam Saponara <saponara TA gmail TOD com> (JavaScript port)
+ * @author Drew Vogel <dvogel AT sunlightfoundation TOD com> (2D optimizations)
  * @version 0.2
- * @date August 8, 2010
+ * @license GPLv3, per http://code.google.com/p/traer-js/
+ * @date October 20, 2011
  *
  */
 
-
-/**
- * A 3-dimensional vector representation with common vector operations
- */
 function Vector() {
 	var argc = arguments.length;
 	if (argc === 2) {
@@ -199,54 +197,6 @@ Attraction.prototype.apply = function() {
 	
 	a.force.add(-a2bx, -a2by);
 	b.force.add(a2bx, a2by);
-};
-
-
-function EulerIntegrator (s) {
-	this.s = s;
-}
-EulerIntegrator.prototype.step = function (t) {
-	this.s.clearForces();
-	this.s.applyForces();
-
-	for (var idx = 0; idx < this.s.particles.length; idx++) {
-		var p = this.s.particles[idx];
-		p.force.scale(t / p.mass);
-		p.velocity.add(p.force.x, p.force.y);
-		p.velocity.scale(t);
-		p.position.add(p.velocity.x, p.velocity.y);
-	}
-};
-
-
-function ModifiedEulerIntegrator (s) {
-	this.s = s;
-};
-ModifiedEulerIntegrator.prototype.step = function (t) {
-	t = 0.7;
-	this.s.clearForces();
-	this.s.applyForces();
-
-	var half_t = t / 2,
-		a = new Vector(0, 0),
-		holder = new Vector(0, 0);
-
-	for (var idx = 0; idx < this.s.particles.length; idx++) {
-		var p = this.s.particles[idx];
-
-		p.force.scale(1 / p.mass);
-		a = new Vector(p.force.x, p.force.y);
-
-		p.velocity.scale(t);
-		p.position.add(p.velocity.x, p.velocity.y);
-		holder = new Vector(p.velocity.x, p.velocity.y);
-
-		a.scale(t);
-		p.velocity.add(a.x, a.y);
-
-		a.scale(half_t);
-		p.position.add(a.x, a.y);
-	}
 };
 
 
@@ -450,27 +400,6 @@ function ParticleSystem(drag) {
 }
 ParticleSystem.DEFAULT_GRAVITY = 0;
 ParticleSystem.DEFAULT_DRAG = 0.001;
-/**
- * @todo Implement other integrators
-
-ParticleSystem.RUNGE_KUTTA = 0;
-ParticleSystem.EULER = 1;
-ParticleSystem.MODIFIED_EULER = 2;
-
-ParticleSystem.prototype.setIntegrator = function(integrator) {
-	switch (integrator) {
-		case ParticleSystem.RUNGE_KUTTA:
-			this.integrator = new RungeKuttaIntegrator(this);
-			break;
-		case ParticleSystem.EULER:
-			this.integrator = new EulerIntegrator(this);
-			break;
-		case ParticleSystem.MODIFIED_EULER:
-			this.integrator = new ModifiedEulerIntegrator(this);
-			break;
-	}
-}
- */
 ParticleSystem.prototype.tick = function() {
 	this.tick_count += 1;
 	this.integrator.step(arguments.length === 0 ? 1 : arguments[0]);
