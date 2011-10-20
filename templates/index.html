@@ -26,8 +26,12 @@
         <div id="mainContent">
 			<a id="jump-to-graph" name="jump-to-graph"></a>
 				<h3 id="ribbon">Find a Company</h3>
-				<p class="tip companyContent">The visualization below illustrates the problems with one of the most common corporate identifiers (DUNS numbers). Type in a name of a company to see the system at work.</p>
-				<p id="viz-explain" class="clear tip companyContent">The graph is created by searching the <a href="http://www.usaspending.gov">USASpending.gov</a> database for contracts and grants that associate a name with a DUNS number or vice versa, repeating until it fails to find any new associations. Inaccuracies may result from name variations, a corporate restructuring not reflected in the D&amp;B data or from simple mis-use of DUNS numbers. Contract and grant details are available from USASpending.gov.</p>
+				<p class="tip companyContent">The main corporate identifier that the federal government uses for grants and contracting is the DUNS number. There's several problems with DUNS numbers, but one issue is that their usage by the federal government is inconsistent. </p>
+
+				<p class="tip companyContent">Often, one company's DUNS number is mistakenly entered for another company's DUNS number. Or, if two companies are on the same contract, only one of their DUNS numbers might be recorded. In order to show how tangled these connections are, we've created the visualization below.</p>
+
+				<p class="tip companyContent">To see all the possible names and DUNS numbers associated a company name in USASpending.gov, enter that company's name in the search box.</p>
+
 				<form class="companyContent" method="get">
 					<input type="search" id="company-name" name="search">
 					<button id="search_btn" type="submit">
@@ -42,6 +46,7 @@
 					</canvas>
 					<div id="low-frame-rate-warning" class="companyContent clear">The data may contain more connections than can be shown here. However your computer is having trouble drawing the graph, so the search has been stopped. It may run better if you close other applications.</div>
 				</div>
+				<p id="viz-explain" class="clear tip companyContent">The graph is created by searching the <a href="http://www.usaspending.gov">USASpending.gov</a> database for contracts and grants that associate a name with a DUNS number or vice versa, repeating until it fails to find any new associations. Inaccuracies may result from name variations, a corporate restructuring not reflected in the D&amp;B data or from simple mis-use of DUNS numbers. Contract and grant details are available from USASpending.gov.</p>
         </div>
     </div>
 	<img id="imgHome" alt="examining a finger print" src="{% media_url "/images/img_fingerprint.jpg" %}"/>
