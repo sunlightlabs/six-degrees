@@ -387,6 +387,16 @@ function ParticleGraph (root, options) {
         return edge_selection;
     };
 
+    this.walk = function (visitor, thisarg) {
+        var walker = function (visitor, node) {
+            visitor.call(thisarg, node);
+            for (var idx = 0; idx < node.children.length; idx++) {
+                walker(visitor, node.children[idx]);
+            }
+        };
+        walker(visitor, root_node);
+    };
+
 	this.pause = function () {
 		var _pause = function () {
 			running = false;
