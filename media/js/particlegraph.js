@@ -517,7 +517,7 @@ function ParticleGraph (root, options) {
             for (var idx = 0; idx < particle_selection.length; idx++) {
                 var prtcl = particle_selection[idx],
                     color_idx = particle_selection.length - idx - 1,
-                    main_color_idx = color_idx % opts.selection_colors.node_main.length,
+                    main_color_idx = bounded(color_idx, 0, opts.selection_colors.node_main.length - 1),
                     main_color = opts.selection_colors.node_main[main_color_idx],
                     border_color_idx = bounded(color_idx, 0, opts.selection_colors.node_border.length - 1),
                     border_color = opts.selection_colors.node_border[border_color_idx];

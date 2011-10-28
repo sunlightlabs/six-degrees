@@ -13,7 +13,7 @@ var GraphOptions = {
     node_main_color: [251, 248, 241, 255],
     node_border_color: [173, 158, 156, 200],
     selection_colors: {
-        node_main: [[251, 248, 241, 255]],
+        node_main: [[230, 48, 9, 255], [251, 248, 241, 255]],
         node_border: [[230, 48, 9, 255], [205, 123, 23, 255]],
         edge: [[173, 159, 156, 255]]
     }
