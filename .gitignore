@@ -1,6 +1,7 @@
 gunicorn.conf.py
 local_settings.py
 *.pyc
+*.bz2
 bin/
 src/
 lib/
@@ -13,3 +14,5 @@ TAGS
 *.xlsx
 *.dot
 *.dot.???
+crawl*.txt
+*.log
