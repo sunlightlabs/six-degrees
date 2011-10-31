@@ -21,7 +21,7 @@
         <div id="featureArea">
             <h2 class="textReplace">Fingerprinting the Private Sector</h2>
             <p>Currently there is no effective unique identifier system for companies that operate within the U.S. This has huge implications for corporate accountability, disclosure in political giving, evaluation of systemic risk in financial markets, oversight of government contracts and more.</p>
-            <p>Play with the visualization below to see how messy our current system is, read an overview of the <a href="#">major federal systems</a> or find a <a href="#">case study</a> of one country that has successfully overcome this problem.</p>
+            <p>Play with the visualization below to see how messy our current system is, read an overview of the <a href="{% url existing-identifiers %}">major federal systems</a> or find a <a href="{% url singapore-uen %}">case study</a> of one country that has successfully overcome this problem.</p>
         </div>
         <div id="mainContent">
 			<a id="jump-to-graph" name="jump-to-graph"></a>
@@ -34,8 +34,9 @@
 
 				<form class="companyContent" method="get">
 					<input type="search" id="company-name" name="search">
-					<button id="search_btn" type="submit">
-						 <span>Search</span>
+					<button id="search_btn" type="submit"><span>Search</span></button><button id="pause_btn" type="button"><span>Pause</span></button>
+					<button id="resume_btn" type="button">
+						 <span>Resume</span>
 					</button>
 				</form>
 

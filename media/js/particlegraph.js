@@ -387,18 +387,44 @@ function ParticleGraph (root, options) {
         return edge_selection;
     };
 
-	this.pause = function () {
+    this.walk = function (visitor, thisarg) {
+        var walker = function (visitor, node) {
+            visitor.call(thisarg, node);
+            for (var idx = 0; idx < node.children.length; idx++) {
+                walker(visitor, node.children[idx]);
+            }
+        };
+        walker(visitor, root_node);
+    };
+
+	this.pause = function (options) {
+        var defaults = {
+            wait_for_queue: false,
+            delay: 0
+        };
+        var opts = $.extend(true, defaults, options);
 		var _pause = function () {
 			running = false;
 			$(that).trigger('paused', []);
 		};
-		if (that.add_link.queue.is_empty()) {
-			setTimeout(_pause, 15 * 1000);
-		} else {
-			$(that.add_link.queue).bind('emptied', function(evt){
-				setTimeout(_pause, 15 * 1000);
-			});
-		}
+        var _schedule_pause = function () {
+            if (opts.delay > 0) {
+                setTimeout(_pause, opts.delay);
+            } else {
+                _pause();
+            }
+        };
+        var _wait = function () {
+            if (opts.wait_for_queue == true) {
+                $(that.add_link.queue).bind('emptied', function(evt){
+                    _schedule_pause();
+                });
+            } else {
+                _schedule_pause();
+            }
+        };
+
+        _wait();
 	};
 
 	this.resume = function () {
@@ -406,21 +432,25 @@ function ParticleGraph (root, options) {
 		$(that).trigger('resumed', []);
 	};
 
+    this.is_running = function () {
+        return running;
+    };
+
     this.sketch_proc = function (processing) {
         processing.draw = function(){
-			frame_rate_buffer.put(processing.__frameRate);
-			if (running == true) {
-				if (processing.frameCount > opts.frames_per_second * 5) {
-					if (frame_rate_buffer.mean() < 6) {
-						$(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
-					}
-				}
+            if (running == true) {
+                frame_rate_buffer.put(processing.__frameRate);
+                if (processing.frameCount > opts.frames_per_second * 5) {
+                    if (frame_rate_buffer.mean() < 6) {
+                        $(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
+                    }
+                }
 
 				physics.tick(1);
 				if (particles.length > 1) {
 					centroid.recalc(particles);
 				}
-			}
+            }
             processing.translate(opts.width / 2, opts.height / 2);
             processing.translate(drag_adjust.x, drag_adjust.y);
             processing.scale(z_scale());
@@ -507,7 +537,7 @@ function ParticleGraph (root, options) {
             for (var idx = 0; idx < particle_selection.length; idx++) {
                 var prtcl = particle_selection[idx],
                     color_idx = particle_selection.length - idx - 1,
-                    main_color_idx = color_idx % opts.selection_colors.node_main.length,
+                    main_color_idx = bounded(color_idx, 0, opts.selection_colors.node_main.length - 1),
                     main_color = opts.selection_colors.node_main[main_color_idx],
                     border_color_idx = bounded(color_idx, 0, opts.selection_colors.node_border.length - 1),
                     border_color = opts.selection_colors.node_border[border_color_idx];
