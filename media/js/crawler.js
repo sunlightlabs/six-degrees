@@ -23,7 +23,7 @@ function Crawler (options) {
     var recv_results = function (response, query_queue, past_results, result_type) {
         if (stopped) {
             if (opts.done_after_stop) {
-                finish();
+                that.finish();
             }
             return;
         }
@@ -78,7 +78,7 @@ function Crawler (options) {
             setTimeout(function(){ search_by_duns(duns); },
                        opts.delay);
         } else {
-            finish();
+            that.finish();
         }
     };
 
