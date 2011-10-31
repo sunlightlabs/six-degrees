@@ -77,7 +77,7 @@ function start_crawler (debug) {
     seed = seed.toUpperCase();
 
     var canvas = document.getElementById("graph");
-    var crawler = new Crawler({delay: 250});
+    var crawler = new Crawler({delay: 250, done_after_stop: false});
     var graph_options = $.extend(true, {}, GraphOptions);
     graph_options = $.extend(true, graph_options, {target: canvas,
                                                    width: $(canvas).width(),
@@ -93,10 +93,30 @@ function start_crawler (debug) {
     var cancel_crawler = function (event) {
         if (p != null) {
             crawler.stop();
+            crawler.finish();
             p.noLoop();
+            p.exit();
             p = null; // Should be the only reference. Let the GC clean up the event bindings.
         };
     };
+    $("#resume_btn").hide();
+    $("#pause_btn").show();
+    $("#pause_btn").click(function(event){ 
+        graph.pause();
+        crawler.stop();
+        $("#pause_btn").hide();
+        $("#resume_btn").show();
+    });
+    $("#resume_btn").click(function(event){
+        graph.resume();
+        try {
+            crawler.resume();
+        } catch (e) {
+            console.log(e);
+        }
+        $("#pause_btn").show();
+        $("#resume_btn").hide();
+    });
     $("#search_btn").click(cancel_crawler);
     $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {
@@ -135,6 +155,9 @@ function start_crawler (debug) {
 }
 
 $(document).ready(function(){
+    $("#pause_btn").hide();
+    $("#resume_btn").hide();
+
     var query_params = (function(a) {
         if (a == "") return {};
         var b = {};

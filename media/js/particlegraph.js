@@ -397,18 +397,34 @@ function ParticleGraph (root, options) {
         walker(visitor, root_node);
     };
 
-	this.pause = function () {
+	this.pause = function (options) {
+        var defaults = {
+            wait_for_queue: false,
+            delay: 0
+        };
+        var opts = $.extend(true, defaults, options);
 		var _pause = function () {
 			running = false;
 			$(that).trigger('paused', []);
 		};
-		if (that.add_link.queue.is_empty()) {
-			setTimeout(_pause, 15 * 1000);
-		} else {
-			$(that.add_link.queue).bind('emptied', function(evt){
-				setTimeout(_pause, 15 * 1000);
-			});
-		}
+        var _schedule_pause = function () {
+            if (opts.delay > 0) {
+                setTimeout(_pause, opts.delay);
+            } else {
+                _pause();
+            }
+        };
+        var _wait = function () {
+            if (opts.wait_for_queue == true) {
+                $(that.add_link.queue).bind('emptied', function(evt){
+                    _schedule_pause();
+                });
+            } else {
+                _schedule_pause();
+            }
+        };
+
+        _wait();
 	};
 
 	this.resume = function () {
@@ -416,21 +432,25 @@ function ParticleGraph (root, options) {
 		$(that).trigger('resumed', []);
 	};
 
+    this.is_running = function () {
+        return running;
+    };
+
     this.sketch_proc = function (processing) {
         processing.draw = function(){
-			frame_rate_buffer.put(processing.__frameRate);
-			if (running == true) {
-				if (processing.frameCount > opts.frames_per_second * 5) {
-					if (frame_rate_buffer.mean() < 6) {
-						$(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
-					}
-				}
+            if (running == true) {
+                frame_rate_buffer.put(processing.__frameRate);
+                if (processing.frameCount > opts.frames_per_second * 5) {
+                    if (frame_rate_buffer.mean() < 6) {
+                        $(that).trigger('lowframerate', [frame_rate_buffer.mean()]);
+                    }
+                }
 
 				physics.tick(1);
 				if (particles.length > 1) {
 					centroid.recalc(particles);
 				}
-			}
+            }
             processing.translate(opts.width / 2, opts.height / 2);
             processing.translate(drag_adjust.x, drag_adjust.y);
             processing.scale(z_scale());
