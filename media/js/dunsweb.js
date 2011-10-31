@@ -180,26 +180,25 @@ $(document).ready(function(){
         event.preventDefault();
         start_crawler(!(query_params['debug'] == null));
         scroll_graph_into_view();
+        setTimeout(function(){ $("#company-name").autocomplete('close'); }, 500);
     });
     $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {
             start_crawler(!(query_params['debug'] == null));
             scroll_graph_into_view();
+            setTimeout(function(){ $("#company-name").autocomplete('close'); }, 500);
         }
         event.preventDefault();
     });
-    $("#company-name").autocomplete({source:
-        function (request, callback) {
+    $("#company-name").autocomplete({
+        minLength: 3,
+        source: function (request, callback) {
             try {
-                if (request.term.length >= 3) {
-                    $.ajax('duns/autocomplete', {
-                           data: request,
-                           success: function (data, textStatus, jqXHR) {
-                               callback(data);
-                           }});
-                } else {
-                    callback([]);
-                }
+                $.ajax('duns/autocomplete', {
+                    data: request,
+                    success: function (data, textStatus, jqXHR) {
+                        callback(data);
+                    }});
             } catch (err) {
                 callback([]);
             }
