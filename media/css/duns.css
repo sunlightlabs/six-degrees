@@ -152,9 +152,9 @@ header nav li.first { background: none;}
 #featureArea h2 { width: 302px; height: 36px; background: url(../images/feature_title.png) top left no-repeat; margin-bottom: 10px;}
 #featureArea p { font-size: 120%; padding-left: 15px;}
 
-#search_btn { background: url(../images/btn_search.jpg) top left no-repeat; width: 113px; height: 35px; display: inline-block; }
-#pause_btn { background: url(../images/btn_pause.jpg) top left no-repeat; width: 158px; height: 30px; display: inline-block; margin: 1px 6px; }
-#resume_btn { background: url(../images/btn_resume.jpg) top left no-repeat; width: 168px; height: 30px;display: inline-block; margin: 1px 6px; }
+#search_btn { background: url(../images/btn_search.jpg) top left no-repeat; width: 113px; height: 35px; }
+#pause_btn { background: url(../images/btn_pause.jpg) top left no-repeat; width: 158px; height: 30px; display: inline-block; position: relative; top: -10px; }
+#resume_btn { background: url(../images/btn_resume.jpg) top left no-repeat; width: 168px; height: 30px;display: inline-block; position: relative; top: -10px; }
 #search_btn:hover { background: url(../images/btn_search.jpg) bottom left no-repeat; }
 #pause_btn:hover { background: url(../images/btn_pause.jpg) bottom left no-repeat; }
 #resume_btn:hover { background: url(../images/btn_resume.jpg) bottom left no-repeat; }
