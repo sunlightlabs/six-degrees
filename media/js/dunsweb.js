@@ -90,6 +90,10 @@ function start_crawler (debug) {
     $(graph).bind('lowframerate', function (event, frame_rate) {
         setTimeout(graph.pause, 15 * 1000);
         crawler.stop();
+        $("#pause_btn").hide();
+        $("#resume_btn").hide();
+        $("#loading_gif").hide();
+        $("#no-connections").hide();
         $("#low-frame-rate-warning").fadeIn();
     });
     var cancel_crawler = function (event) {
@@ -138,10 +142,10 @@ function start_crawler (debug) {
        
         var check_for_lack_of_connections = function () {
             if (graph.particle_count() == 1) {
-                $("#no-connections").show();
+                $("#no-connections").fadeIn();
             }
         }
-        if (graph.add_link.queue.backlog_size() == -1) {
+        if (graph.add_link.queue.backlog_size() == 0) {
             check_for_lack_of_connections();
         } else {
             $(graph.add_link.queue).bind('emptied', check_for_lack_of_connections);
