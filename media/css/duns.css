@@ -152,9 +152,11 @@ header nav li.first { background: none;}
 #featureArea h2 { width: 302px; height: 36px; background: url(../images/feature_title.png) top left no-repeat; margin-bottom: 10px;}
 #featureArea p { font-size: 120%; padding-left: 15px;}
 
+#ctl_button_area { position: relative; top: -14px; }
 #search_btn { background: url(../images/btn_search.jpg) top left no-repeat; width: 113px; height: 35px; }
-#pause_btn { background: url(../images/btn_pause.jpg) top left no-repeat; width: 158px; height: 30px; display: inline-block; position: relative; top: -10px; }
-#resume_btn { background: url(../images/btn_resume.jpg) top left no-repeat; width: 168px; height: 30px;display: inline-block; position: relative; top: -10px; }
+#pause_btn { background: url(../images/btn_pause.jpg) top left no-repeat; width: 158px; height: 30px; display: inline-block; vertical-align: top; }
+#resume_btn { background: url(../images/btn_resume.jpg) top left no-repeat; width: 168px; height: 30px; display: inline-block; vertical-align: top; }
+#loading_gif { display: inline-block; position: relative; margin: 0; padding: 0; vertical-align: top; }
 #search_btn:hover { background: url(../images/btn_search.jpg) bottom left no-repeat; }
 #pause_btn:hover { background: url(../images/btn_pause.jpg) bottom left no-repeat; }
 #resume_btn:hover { background: url(../images/btn_resume.jpg) bottom left no-repeat; }
@@ -224,7 +226,7 @@ div#marquee span.number {
 	font-weight: bold;
 }
 
-#low-frame-rate-warning {
+#low-frame-rate-warning, #no-connections {
     display: none;
     color: #d00000;
     font-weight: bold;

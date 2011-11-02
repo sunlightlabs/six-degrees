@@ -38,14 +38,14 @@
                         <span>Search</span>
                     </button>
                     <br>
-                    <div style="position: relative;">
+                    <div id="ctl_button_area">
                         <button id="pause_btn" type="button">
                             <span>Pause</span>
                         </button>
                         <button id="resume_btn" type="button">
                             <span>Resume</span>
                         </button>
-                        <img id="loading_gif" style="display:none;" src="/media/images/loading.gif" />
+                        <img id="loading_gif" src="{% media_url %}/images/loading.gif" />
                     </div>
 				</form>
 
@@ -54,6 +54,7 @@
 				<div id="viz-container" style="position: relative;">
 					<canvas id="graph">
 					</canvas>
+					<div id="no-connections" class="companyContent clear">No connections were found. This may be because the company you searched for didn't do business with the federal government or because that business was conducted under an alternate name.</div>
 					<div id="low-frame-rate-warning" class="companyContent clear">The data may contain more connections than can be shown here. However your computer is having trouble drawing the graph, so the search has been stopped. It may run better if you close other applications.</div>
 				</div>
 				<p id="viz-explain" class="clear tip companyContent">The graph is created by searching the <a href="http://www.usaspending.gov">USASpending.gov</a> database for contracts and grants that associate a name with a DUNS number or vice versa, repeating until it fails to find any new associations. Inaccuracies may result from name variations, a corporate restructuring not reflected in the D&amp;B data or from simple mis-use of DUNS numbers. Contract and grant details are available from USASpending.gov.</p>

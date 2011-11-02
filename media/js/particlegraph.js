@@ -367,6 +367,10 @@ function ParticleGraph (root, options) {
         centroid.y0.setValue(0.0);
     };
 
+    this.particle_count = function () {
+        return particles.length;
+    };
+
     var selected_particles = function () {
         var selection = [];
         if (selected_node != null) {

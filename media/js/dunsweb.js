@@ -68,6 +68,8 @@ function scroll_graph_into_view () {
 
 function start_crawler (debug) {
     $("#low-frame-rate-warning").hide();
+    $("#no-connections").hide();
+
     var seed = $("#company-name").val();
     if (seed == null)
         return;
@@ -93,7 +95,6 @@ function start_crawler (debug) {
     var cancel_crawler = function (event) {
         if (p != null) {
             crawler.stop();
-            crawler.finish();
             p.noLoop();
             p.exit();
             p = null; // Should be the only reference. Let the GC clean up the event bindings.
@@ -101,10 +102,12 @@ function start_crawler (debug) {
     };
     $("#resume_btn").hide();
     $("#pause_btn").show();
+    $("#loading_gif").show();
     $("#pause_btn").click(function(event){ 
         graph.pause();
         crawler.stop();
         $("#pause_btn").hide();
+        $("#loading_gif").hide();
         $("#resume_btn").show();
     });
     $("#resume_btn").click(function(event){
@@ -112,9 +115,10 @@ function start_crawler (debug) {
         try {
             crawler.resume();
         } catch (e) {
-            console.log(e);
+            // no-op
         }
         $("#pause_btn").show();
+        $("#loading_gif").show();
         $("#resume_btn").hide();
     });
     $("#search_btn").click(cancel_crawler);
@@ -127,11 +131,13 @@ function start_crawler (debug) {
         display_route_to_root(node);
     });
     $(crawler).bind('done', function(){
-        setTimeout(function(){
-            graph.pause();
-            $("#pause_btn").hide();
-            $("#resume_btn").hide();
-        }, 15 * 1000);
+        setTimeout(graph.pause, 15 * 1000);
+        $("#pause_btn").hide();
+        $("#loading_gif").hide();
+        $("#resume_btn").hide();
+        if (graph.particle_count() == 1) {
+            $("#no-connections").show();
+        }
     });
     $("#cancel-search-btn").click(function(){
         crawler.stop();
@@ -160,6 +166,7 @@ function start_crawler (debug) {
 
 $(document).ready(function(){
     $("#pause_btn").hide();
+    $("#loading_gif").hide();
     $("#resume_btn").hide();
 
     var query_params = (function(a) {
