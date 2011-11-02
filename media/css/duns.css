@@ -180,7 +180,7 @@ h3 { font-size: 120%;}
 #ltColumn { width: 605px;}
 
 #resources { margin-left: 25px; }
-#resources li { margin-bottom: 15px; background: url(../images/bg_navCircle.jpg) left 7px no-repeat; padding-left: 20px;}
+#resources li { margin-bottom: 15px; background: url(../images/bg_navCircle.jpg) left 7px no-repeat; padding-left: 20px; list-style-type:none;}
 
 .copy li { list-style-type: disc; margin-left: 35px; margin-bottom: 5px;}
 .copy ul { margin-bottom: 25px;}
