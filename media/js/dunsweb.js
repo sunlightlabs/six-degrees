@@ -127,7 +127,11 @@ function start_crawler (debug) {
         display_route_to_root(node);
     });
     $(crawler).bind('done', function(){
-        setTimeout(graph.pause, 15 * 1000);
+        setTimeout(function(){
+            graph.pause();
+            $("#pause_btn").hide();
+            $("#resume_btn").hide();
+        }, 15 * 1000);
     });
     $("#cancel-search-btn").click(function(){
         crawler.stop();
