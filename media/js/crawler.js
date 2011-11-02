@@ -21,7 +21,7 @@ function Crawler (options) {
     var link_results = [];
 
     var recv_results = function (response, query_queue, past_results, result_type) {
-        if (stopped) {
+        if (done) {
             if (opts.done_after_stop) {
                 that.finish();
             }
@@ -45,7 +45,9 @@ function Crawler (options) {
                 $(that).trigger('linkresult', [a_to_b, result_type]);
             }
         }
-        process_queues();
+        if (!stopped && !done) {
+            process_queues();
+        }
     };
 
     var recv_names = function (data, text_status, xhr) {
