@@ -249,11 +249,9 @@ def autocomplete(request):
     term = request.GET.get('term')
     if term is not None:
         term = term.upper()
-        names = [n.name.upper() for n in Name.objects.filter(autocomplete_candidate=True,
-                                                             name__istartswith=term)]
+        names = [n.name.upper() for n in Name.objects.filter(name__istartswith=term)]
         if len(names) == 0:
-            names = [n.name.upper() for n in Name.objects.filter(autocomplete_candidate=True,
-                                                                 name__icontains=term)]
+            names = [n.name.upper() for n in Name.objects.filter(name__icontains=term)]
         names.sort(key=lambda n: n.index(term))
         names.sort(key=lambda n: len(n))
         if len(names) > 18:
