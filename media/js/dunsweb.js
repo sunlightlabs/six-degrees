@@ -13,7 +13,7 @@ var GraphOptions = {
     node_main_color: [251, 248, 241, 255],
     node_border_color: [173, 158, 156, 200],
     selection_colors: {
-        node_main: [[251, 248, 241, 255]],
+        node_main: [[230, 48, 9, 255], [251, 248, 241, 255]],
         node_border: [[230, 48, 9, 255], [205, 123, 23, 255]],
         edge: [[173, 159, 156, 255]]
     }
@@ -68,6 +68,8 @@ function scroll_graph_into_view () {
 
 function start_crawler (debug) {
     $("#low-frame-rate-warning").hide();
+    $("#no-connections").hide();
+
     var seed = $("#company-name").val();
     if (seed == null)
         return;
@@ -77,7 +79,7 @@ function start_crawler (debug) {
     seed = seed.toUpperCase();
 
     var canvas = document.getElementById("graph");
-    var crawler = new Crawler({delay: 250});
+    var crawler = new Crawler({delay: 250, done_after_stop: false});
     var graph_options = $.extend(true, {}, GraphOptions);
     graph_options = $.extend(true, graph_options, {target: canvas,
                                                    width: $(canvas).width(),
@@ -88,15 +90,41 @@ function start_crawler (debug) {
     $(graph).bind('lowframerate', function (event, frame_rate) {
         setTimeout(graph.pause, 15 * 1000);
         crawler.stop();
+        $("#pause_btn").hide();
+        $("#resume_btn").hide();
+        $("#loading_gif").hide();
+        $("#no-connections").hide();
         $("#low-frame-rate-warning").fadeIn();
     });
     var cancel_crawler = function (event) {
         if (p != null) {
             crawler.stop();
             p.noLoop();
+            p.exit();
             p = null; // Should be the only reference. Let the GC clean up the event bindings.
         };
     };
+    $("#resume_btn").hide();
+    $("#pause_btn").show();
+    $("#loading_gif").show();
+    $("#pause_btn").click(function(event){ 
+        graph.pause();
+        crawler.stop();
+        $("#pause_btn").hide();
+        $("#loading_gif").hide();
+        $("#resume_btn").show();
+    });
+    $("#resume_btn").click(function(event){
+        graph.resume();
+        try {
+            crawler.resume();
+        } catch (e) {
+            // no-op
+        }
+        $("#pause_btn").show();
+        $("#loading_gif").show();
+        $("#resume_btn").hide();
+    });
     $("#search_btn").click(cancel_crawler);
     $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {
@@ -108,6 +136,20 @@ function start_crawler (debug) {
     });
     $(crawler).bind('done', function(){
         setTimeout(graph.pause, 15 * 1000);
+        $("#pause_btn").hide();
+        $("#loading_gif").hide();
+        $("#resume_btn").hide();
+       
+        var check_for_lack_of_connections = function () {
+            if (graph.particle_count() == 1) {
+                $("#no-connections").fadeIn();
+            }
+        }
+        if (graph.add_link.queue.backlog_size() == 0) {
+            check_for_lack_of_connections();
+        } else {
+            $(graph.add_link.queue).bind('emptied', check_for_lack_of_connections);
+        }
     });
     $("#cancel-search-btn").click(function(){
         crawler.stop();
@@ -130,10 +172,15 @@ function start_crawler (debug) {
    });
 
     crawler.start(seed, 'name');
+    $("#example-graph").hide();
     $("#viz-container:hidden").fadeIn(800);
 }
 
 $(document).ready(function(){
+    $("#pause_btn").hide();
+    $("#loading_gif").hide();
+    $("#resume_btn").hide();
+
     var query_params = (function(a) {
         if (a == "") return {};
         var b = {};
@@ -156,14 +203,31 @@ $(document).ready(function(){
         event.preventDefault();
         start_crawler(!(query_params['debug'] == null));
         scroll_graph_into_view();
+        setTimeout(function(){ $("#company-name").autocomplete('close'); }, 500);
     });
     $("#company-name").keyup(function(event){
         if (event.keyCode == 13) {
             start_crawler(!(query_params['debug'] == null));
             scroll_graph_into_view();
+            setTimeout(function(){ $("#company-name").autocomplete('close'); }, 500);
         }
         event.preventDefault();
     });
+    $("#company-name").autocomplete({
+        minLength: 3,
+        source: function (request, callback) {
+            try {
+                $.ajax('duns/autocomplete', {
+                    data: request,
+                    success: function (data, textStatus, jqXHR) {
+                        callback(data);
+                    }});
+            } catch (err) {
+                callback([]);
+            }
+        }
+    });
+
 
     if(typeof String.prototype.trim !== 'function') {
         String.prototype.trim = function() {

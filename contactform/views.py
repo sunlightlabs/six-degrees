@@ -34,8 +34,7 @@ def form_post(post, ctx):
     (sent, error) = send_contact_email(post)
     if not sent:
         return render_to_response('contactform/sendfail.html', 
-                                  {'request': post,
-                                   'error': error})
+                                  {'error': error})
 
     return HttpResponseRedirect(reverse('contactform-sent'))
 

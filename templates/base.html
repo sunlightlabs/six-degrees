@@ -12,6 +12,7 @@
 		{% block head_epilogue %}
 		{% endblock %}
 	</head>
+	{% css humanity/jquery-ui-1.8.14.custom.css %}
 	{% css duns.css %}
 	<body  class="{% block bodyclass %}home{% endblock %}">
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
@@ -57,13 +58,14 @@
 	        <div id="footerText">
 	            <h3 class="textReplace">Like this project and want to discover others like it?</h3>
 	            <span class="tip">Join the Sunlight Foundation’s open government community to learn more</span>
-    	        <form action="/search/" method="get">
+    	        <form action="http://organizing.sunlightfoundation.com/page/s/6-degrees-signups" method="post">
+                    <input type="hidden" name="custom-933" value="sixdegrees" />
                     <ul>
                         <li>
                             <input id="id_email" type="email" placeholder="Your email address" name="email">
                         </li>  
                         <li>
-                            <input id="id_zip" type="zip" placeholder="Your zip code" name="email">
+                            <input id="id_zip" type="zip" placeholder="Your zip code" name="zip">
                         </li>
                         <li>  
                             <button id="submit_btn" type="submit">
@@ -83,5 +85,19 @@
 			});
 		</script>
 		<![endif]-->
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-22821126-10']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
 	</body>
 </html>

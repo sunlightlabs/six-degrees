@@ -21,8 +21,10 @@ function Crawler (options) {
     var link_results = [];
 
     var recv_results = function (response, query_queue, past_results, result_type) {
-        if (stopped) {
-            finish();
+        if (done) {
+            if (opts.done_after_stop) {
+                that.finish();
+            }
             return;
         }
 
@@ -43,7 +45,9 @@ function Crawler (options) {
                 $(that).trigger('linkresult', [a_to_b, result_type]);
             }
         }
-        process_queues();
+        if (!stopped && !done) {
+            process_queues();
+        }
     };
 
     var recv_names = function (data, text_status, xhr) {
@@ -76,23 +80,33 @@ function Crawler (options) {
             setTimeout(function(){ search_by_duns(duns); },
                        opts.delay);
         } else {
-            finish();
+            that.finish();
         }
     };
 
-    var finish = function () {
+    this.finish = function () {
         done = true;
         $(that).trigger('done', duns_results, name_results);
-    }
+    };
 
     this.stop = function () {
         stopped = true;
         $(that).trigger('stop');
-    }
+    };
+
+    this.resume = function () {
+        if (done) {
+            throw 'Crawler previously completed the search.';
+        }
+
+        stopped = false;
+        started = true;
+        process_queues();
+    };
 
     this.start = function (seed, seed_type) {
         if (started || stopped || done ) {
-            throw "Crawler objects are not restartable.";
+            throw "Crawler objects are not restartable. Did you mean resume()?";
             return;
         }
 
@@ -109,7 +123,7 @@ function Crawler (options) {
         }
     };
 
-    this.is_running = function () { return started && !done; };
+    this.is_running = function () { return started && !done && !stopped; };
     this.is_started = function () { return started; };
     this.is_done = function () { return started && done; };
     this.name_queue_length = function () { return name_queue.length; };

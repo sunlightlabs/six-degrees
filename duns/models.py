@@ -4,8 +4,12 @@ from django.db import models
 class Name(models.Model):
     name = models.CharField("DUNS-linked name", max_length=255,
                             blank=False, null=False, unique=True)
+    duns_count = models.IntegerField("Number of DUNS numbers associated with this name",
+                                     blank=True, null=True, db_index=True)
+    duns_count_updated = models.DateTimeField(blank=True, null=True, db_index=True)
+    autocomplete_candidate = models.BooleanField(default=True, blank=False, null=False)
     def __repr__(self):
-        return "<Name(%s)>" % self.name
+        return "<Name(%r)>" % self.name
 
 
 class DUNS(models.Model):
