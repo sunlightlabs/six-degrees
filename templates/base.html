@@ -14,8 +14,8 @@
 	</head>
 	{% css humanity/jquery-ui-1.8.14.custom.css %}
 	{% css duns.css %}
+    {% css browser-warning.css %}
 	<body  class="{% block bodyclass %}home{% endblock %}">
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
 	    <div class="sf_mini_header">
         	<div class="sf_mini_header_nav_wrapper">
         		<h1 id="sunFoundation"><a class="textReplace" href="http://www.sunlightfoundation.com">Sunlight Foundation</a></h1>
@@ -33,6 +33,10 @@
             	</nav>
         		<div class="clear"></div>
         	</div>
+        </div>
+        <div id="browser-upgrade-warning" style="display: none;">
+            <div class="warning-title"><a href="http://www.whatbrowser.org"><span>You Should Upgrade Your Browser</span></a></div>
+            <div class="warning-explanation"><span>This website uses technologies that are standard in newer web browsers but missing in yours. You will have problems viewing parts of this website. Please <a href="http://www.whatbrowser.org">consider upgrading your web browser</a> for a better viewing experience.</span></div>
         </div>
 	    <header>
 		<h1><a class="textReplace" href="{% url index %}">Six Degrees of Corporations</a></h1>
@@ -76,14 +80,17 @@
             </div>
             <div class="clear"></div>
 	    </footer>
-		<!--[if lt IE 9]>
-		<script>
-			CFInstall.check({
-				mode: "overlay",
-				destination: window.location,
-			});
-		</script>
-		<![endif]-->
+        {% js "browser-detect.js" %}
+        {% js "browser-warning.js" %}
+        <script type="text/javascript">
+        WarnBrowsers({
+            target: 'browser-upgrade-warning',
+            min_versions: {
+                'Explorer': 9,
+                'Firefox': 4,
+                'Chrome': 6
+            }}); 
+        </script>
 <script type="text/javascript">
 
   var _gaq = _gaq || [];

@@ -1,0 +1,26 @@
+#browser-upgrade-warning {
+  font-family: sans-serif;
+  border-radius: 14px;
+  background-color: #cc0000;
+  color: #fafafa;
+  padding: 10px;
+  width: 500px;
+  margin: 4px auto 4px;
+  line-height: 22px;
+  clear: both;
+}
+
+#browser-upgrade-warning .warning-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#browser-upgrade-warning .warning-explanation {
+  font-size: 12px;
+}
+
+#browser-upgrade-warning a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+}
