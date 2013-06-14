@@ -359,4 +359,4 @@ table.node-grants > thead > tr > th {
     text-align: left;
 }
 
-
+#downloadReport { background: url(../images/bg_downloadBtn.png) bottom right no-repeat; width: 101px; height: 99px; position: relative; right: -830px; top: 20px;}

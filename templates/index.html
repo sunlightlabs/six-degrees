@@ -26,11 +26,11 @@
         <div id="mainContent">
 			<a id="jump-to-graph" name="jump-to-graph"></a>
 				<h3 id="ribbon">Find a Company</h3>
-				<p class="tip companyContent">The main corporate identifier that the federal government uses for grants and contracting is the DUNS number. There's several problems with DUNS numbers, but one issue is that their usage by the federal government is inconsistent. </p>
+				<p class="tip companyContent">The main corporate identifier that the federal government uses for grants and contracting is the DUNS number. There are several problems with DUNS numbers, but one issue is that their usage by the federal government is inconsistent. </p>
 
 				<p class="tip companyContent">Often, one company's DUNS number is mistakenly entered for another company's DUNS number. Or, if two companies are on the same contract, only one of their DUNS numbers might be recorded. In order to show how tangled these connections are, we've created the visualization below.</p>
 
-				<p class="tip companyContent">To see all the possible names and DUNS numbers associated a company name in USASpending.gov, enter that company's name in the search box.</p>
+				<p class="tip companyContent">To see all the possible names and DUNS numbers associated with a company name in USASpending.gov, enter that company's name in the search box.</p>
 
 				<form class="companyContent" method="get">
 					<input type="search" id="company-name" name="search">
@@ -45,7 +45,7 @@
                         <button id="resume_btn" type="button">
                             <span>Resume</span>
                         </button>
-                        <img id="loading_gif" src="{% media_url %}/images/loading.gif" />
+                        <img id="loading_gif"  style="display:none;" src="{% media_url %}/images/loading.gif" />
                     </div>
 				</form>
 
