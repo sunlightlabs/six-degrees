@@ -2,6 +2,7 @@ gunicorn.conf.py
 local_settings.py
 *.pyc
 *.bz2
+tmp/
 bin/
 src/
 lib/
