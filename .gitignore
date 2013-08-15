@@ -17,3 +17,4 @@ TAGS
 *.dot.???
 crawl*.txt
 *.log
+.DS_Store
