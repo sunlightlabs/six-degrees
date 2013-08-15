@@ -108,28 +108,19 @@ button, .buttonLink { width: auto; text-indent: -9999em; display: block; border:
 
 
 .sf_mini_header {
-	background: url('../images/sf_mini_nav_bg.jpg') center top no-repeat;
-	background-color: #b7d2ef;
-	height: 41px;
-	border-bottom: 3px solid #fff;
+	background: url('../images/sfapp_bg_header.jpg') center bottom repeat-x;
+	background-color: rgb(231, 240, 233);
+	height: 53px;
 	margin-bottom: 40px;
+	border-bottom: 1px dashed #fff;	
 }
-
-#sunFoundation { width: 158px; float: left; height: 41px; margin-right: 30px;}
-#sunFoundation a { background: url('../images/sf_mini_logo.png') top left no-repeat; width: 158px; height: 41px; }
-
-.sf_mini_header_nav_wrapper li{
-	float: left;
-	padding: 11px 35px 0 0;
-}
-
-.sf_mini_header_nav_wrapper { margin-bottom: 50px;}
-
-.sf_mini_header_nav_wrapper a{
-	text-decoration: none;
-	color: #494442;
-	text-transform: uppercase;
-	font-size: 90%;
+.sf_mini_header .sf-logo {
+	background: url('../images/sfapp_logo.png') top right no-repeat;
+	float: right;
+	height: 40px;
+	width: 160px;
+	margin-top: 5px;	
+	color: transparent;		
 }
 
 header { margin-top: 50px;}
