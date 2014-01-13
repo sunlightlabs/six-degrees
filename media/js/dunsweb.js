@@ -98,32 +98,32 @@ function start_crawler (debug) {
     });
     var cancel_crawler = function (event) {
         if (p != null) {
-            crawler.stop();
             p.noLoop();
             p.exit();
             p = null; // Should be the only reference. Let the GC clean up the event bindings.
+            crawler.stop();
         };
     };
     $("#resume_btn").hide();
     $("#pause_btn").show();
     $("#loading_gif").show();
     $("#pause_btn").click(function(event){ 
-        graph.pause();
-        crawler.stop();
         $("#pause_btn").hide();
         $("#loading_gif").hide();
         $("#resume_btn").show();
+        graph.pause();
+        crawler.stop();
     });
     $("#resume_btn").click(function(event){
+        $("#pause_btn").show();
+        $("#loading_gif").show();
+        $("#resume_btn").hide();
         graph.resume();
         try {
             crawler.resume();
         } catch (e) {
             // no-op
         }
-        $("#pause_btn").show();
-        $("#loading_gif").show();
-        $("#resume_btn").hide();
     });
     $("#search_btn").click(cancel_crawler);
     $("#company-name").keyup(function(event){
@@ -152,8 +152,8 @@ function start_crawler (debug) {
         }
     });
     $("#cancel-search-btn").click(function(){
-        crawler.stop();
         $("#search-queue-length").text("");
+        crawler.stop();
     });
     $(crawler).bind('noderesult', function (event, node_value, result_type) {
         var search_queue_length = crawler.name_queue_length() + crawler.duns_queue_length();
